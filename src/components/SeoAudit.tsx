@@ -49,10 +49,18 @@ export function SeoAudit({ onBack }: SeoAuditProps) {
       );
 
       if (!response.ok) {
-        throw new Error('Analysis failed');
+        const errorData = await response.text();
+        console.error('API Error:', errorData);
+        throw new Error(`Analysis failed: ${response.status}`);
       }
 
       const data = await response.json();
+      console.log('SEO Audit Response:', data);
+
+      if (data.error) {
+        throw new Error(data.error);
+      }
+
       setResult(data);
 
       await supabase.from('seo_audits').insert({
@@ -67,6 +75,7 @@ export function SeoAudit({ onBack }: SeoAuditProps) {
         recommendations: data.recommendations || [],
       });
     } catch (err) {
+      console.error('Analysis error:', err);
       setError(err instanceof Error ? err.message : 'Analysis failed');
     } finally {
       setIsAnalyzing(false);
