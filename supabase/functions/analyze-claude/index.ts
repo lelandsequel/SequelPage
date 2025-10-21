@@ -88,6 +88,8 @@ Reference specific CVEs where applicable and provide production-ready security p
     const data = await response.json();
     const content = data.content[0].text;
 
+    console.log('Claude raw response:', content);
+
     let analysis;
     try {
       const jsonMatch = content.match(/\{[\s\S]*\}/);
@@ -96,10 +98,25 @@ Reference specific CVEs where applicable and provide production-ready security p
       } else {
         analysis = JSON.parse(content);
       }
+
+      if (!analysis.score) {
+        console.error('Missing score in response:', analysis);
+        analysis.score = 0;
+      }
+      if (!analysis.grade) {
+        analysis.grade = 'N/A';
+      }
+
+      console.log('Parsed analysis:', analysis);
     } catch (e) {
+      console.error('JSON parse error:', e);
       analysis = {
-        rawResponse: content,
+        score: 0,
+        grade: 'F',
         error: "Failed to parse JSON response",
+        rawResponse: content,
+        seoIssues: [],
+        aeoOptimizations: [],
       };
     }
 

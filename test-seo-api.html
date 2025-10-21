@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test SEO API</title>
+</head>
+<body>
+    <h1>Test SEO Audit API</h1>
+    <button onclick="testAPI()">Test API Call</button>
+    <pre id="result"></pre>
+
+    <script>
+        async function testAPI() {
+            const resultEl = document.getElementById('result');
+            resultEl.textContent = 'Loading...';
+
+            try {
+                const response = await fetch(
+                    'https://ebdwtjdizsdfanjaihnz.supabase.co/functions/v1/analyze-claude',
+                    {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImViZHd0amRpenNkZmFuamFpaG56Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA5OTIzODUsImV4cCI6MjA3NjU2ODM4NX0._hbBUdagU4EjrvpXKeOC61lXQllQX0yjdMTEPliSG3w',
+                        },
+                        body: JSON.stringify({
+                            type: 'seo',
+                            htmlSource: '<html><head><title>Test</title></head><body><h1>Hello</h1></body></html>',
+                        }),
+                    }
+                );
+
+                const data = await response.json();
+                resultEl.textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                resultEl.textContent = 'Error: ' + error.message;
+            }
+        }
+    </script>
+</body>
+</html>
