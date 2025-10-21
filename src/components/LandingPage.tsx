@@ -1,11 +1,15 @@
-import { Search, Shield, FileText, Users, Calendar } from 'lucide-react';
+import { Search, Shield, FileText, Users, Calendar, Settings, LogOut } from 'lucide-react';
 import { Card } from './Card';
+import { Button } from './Button';
+import { useAuth } from '../lib/auth';
 
 interface LandingPageProps {
   onNavigate: (page: string) => void;
 }
 
 export function LandingPage({ onNavigate }: LandingPageProps) {
+  const { signOut } = useAuth();
+
   const tools = [
     {
       id: 'seo',
@@ -47,15 +51,35 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
       color: 'from-amber-500 to-amber-600',
       features: ['Auto Industry ID', 'Weekly Reports', 'Email Delivery', 'Campaign Management'],
     },
+    {
+      id: 'clients',
+      title: 'Client Management',
+      description: 'Manage client accounts, assign reports, and control access permissions.',
+      icon: Settings,
+      color: 'from-purple-500 to-purple-600',
+      features: ['Add Clients', 'Manage Users', 'Assign Reports', 'Access Control'],
+    },
   ];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-gray-50 to-blue-100">
+      <nav className="bg-white border-b border-gray-200">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex justify-between items-center">
+            <h1 className="text-2xl font-bold text-gray-900">CandlPage Admin</h1>
+            <Button onClick={signOut} variant="secondary" size="sm">
+              <LogOut className="w-4 h-4 mr-2" />
+              Sign Out
+            </Button>
+          </div>
+        </div>
+      </nav>
+
       <div className="container mx-auto px-4 py-12">
         <div className="text-center mb-12">
-          <h1 className="text-5xl font-bold text-gray-900 mb-4">
-            CandlPage
-          </h1>
+          <h2 className="text-5xl font-bold text-gray-900 mb-4">
+            Admin Dashboard
+          </h2>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
             Professional Audit & Content Generation Suite for C&L Strategy Clients
           </p>
