@@ -92,12 +92,14 @@ Reference specific CVEs where applicable and provide production-ready security p
 
     let analysis;
     try {
-      const jsonMatch = content.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        analysis = JSON.parse(jsonMatch[0]);
-      } else {
-        analysis = JSON.parse(content);
+      let cleanContent = content.trim();
+      if (cleanContent.startsWith('```')) {
+        cleanContent = cleanContent.replace(/^```(?:json)?\n?/, '');
+        cleanContent = cleanContent.replace(/\n?```$/, '');
+        cleanContent = cleanContent.trim();
       }
+
+      analysis = JSON.parse(cleanContent);
 
       if (!analysis.score) {
         console.error('Missing score in response:', analysis);
