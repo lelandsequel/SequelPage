@@ -26,7 +26,7 @@ Deno.serve(async (req: Request) => {
     let userPrompt = "";
 
     if (type === "seo") {
-      systemPrompt = `You are an expert SEO and AEO (Answer Engine Optimization) analyst. Analyze websites comprehensively and provide actionable recommendations with code snippets.`;
+      systemPrompt = `You are an expert SEO and AEO (Answer Engine Optimization) analyst. Analyze websites comprehensively and provide actionable recommendations with code snippets. Return ONLY valid JSON without any markdown formatting.`;
       
       userPrompt = `Analyze this website for SEO and AEO optimization.
 
@@ -42,9 +42,9 @@ Provide a comprehensive analysis in JSON format with:
 6. contentGaps (array of {gap, whyItMatters, suggestions, recommendedFormat})
 7. recommendations (array of {title, description, codeSnippet, expectedImprovement})
 
-Provide specific, production-ready code snippets and quantified improvements.`;
+Provide specific, production-ready code snippets and quantified improvements. Return ONLY the JSON object, no markdown code fences.`;
     } else if (type === "security") {
-      systemPrompt = `You are an expert cybersecurity analyst. Analyze websites for security vulnerabilities, CVEs, and provide remediation steps with code.`;
+      systemPrompt = `You are an expert cybersecurity analyst. Analyze websites for security vulnerabilities, CVEs, and provide remediation steps with code. Return ONLY valid JSON without any markdown formatting.`;
       
       userPrompt = `Perform a security audit on this website.
 
@@ -57,7 +57,7 @@ Provide a comprehensive security analysis in JSON format with:
 3. fixes (array of {vulnerability, codeFix, configuration, bestPractices})
 4. strategicReport (object with {executiveSummary, detailedFindings, remediationRoadmap, expectedImprovements})
 
-Reference specific CVEs where applicable and provide production-ready security patches.`;
+Reference specific CVEs where applicable and provide production-ready security patches. Return ONLY the JSON object, no markdown code fences.`;
     }
 
     const response = await fetch("https://api.anthropic.com/v1/messages", {
@@ -68,8 +68,8 @@ Reference specific CVEs where applicable and provide production-ready security p
         "anthropic-version": "2023-06-01",
       },
       body: JSON.stringify({
-        model: "claude-haiku-4-5",
-        max_tokens: 4096,
+        model: "claude-3-5-sonnet-20241022",
+        max_tokens: 8000,
         system: systemPrompt,
         messages: [
           {
@@ -88,8 +88,6 @@ Reference specific CVEs where applicable and provide production-ready security p
     const data = await response.json();
     const content = data.content[0].text;
 
-    console.log('Claude raw response:', content);
-
     let analysis;
     try {
       let cleanContent = content.trim();
@@ -102,21 +100,17 @@ Reference specific CVEs where applicable and provide production-ready security p
       analysis = JSON.parse(cleanContent);
 
       if (!analysis.score) {
-        console.error('Missing score in response:', analysis);
         analysis.score = 0;
       }
       if (!analysis.grade) {
         analysis.grade = 'N/A';
       }
-
-      console.log('Parsed analysis:', analysis);
     } catch (e) {
-      console.error('JSON parse error:', e);
       analysis = {
         score: 0,
         grade: 'F',
         error: "Failed to parse JSON response",
-        rawResponse: content,
+        rawResponse: content.substring(0, 1000),
         seoIssues: [],
         aeoOptimizations: [],
       };

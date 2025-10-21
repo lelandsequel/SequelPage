@@ -57,11 +57,16 @@ export function SeoAudit({ onBack }: SeoAuditProps) {
       const data = await response.json();
       console.log('SEO Audit Response:', data);
 
-      if (data.error) {
+      if (data.error && data.error !== "Failed to parse JSON response") {
         throw new Error(data.error);
       }
 
-      setResult(data);
+      // Even if there was a parse error, show what we have
+      if (data.score !== undefined || data.rawResponse) {
+        setResult(data);
+      } else {
+        throw new Error('No valid data returned');
+      }
 
       await supabase.from('seo_audits').insert({
         url: url || 'HTML Source',
