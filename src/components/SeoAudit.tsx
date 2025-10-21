@@ -33,7 +33,7 @@ export function SeoAudit({ onBack }: SeoAuditProps) {
       const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
       const response = await fetch(
-        `${supabaseUrl}/functions/v1/analyze-claude`,
+        `${supabaseUrl}/functions/v1/comprehensive-seo-audit`,
         {
           method: 'POST',
           headers: {
@@ -41,7 +41,6 @@ export function SeoAudit({ onBack }: SeoAuditProps) {
             'Authorization': `Bearer ${supabaseKey}`,
           },
           body: JSON.stringify({
-            type: 'seo',
             url,
             htmlSource,
           }),
@@ -209,6 +208,63 @@ export function SeoAudit({ onBack }: SeoAuditProps) {
                   </Button>
                 </div>
               </div>
+
+              {result.realMetrics && (
+                <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                  <h3 className="text-lg font-bold text-gray-900 mb-3">Real Performance Metrics</h3>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    {result.realMetrics.dataForSeo?.performance && (
+                      <>
+                        <div>
+                          <div className="text-sm text-gray-600">Performance Score</div>
+                          <div className="text-2xl font-bold text-gray-900">{Math.round(result.realMetrics.dataForSeo.performance.score)}</div>
+                        </div>
+                        <div>
+                          <div className="text-sm text-gray-600">LCP</div>
+                          <div className="text-2xl font-bold text-gray-900">{(result.realMetrics.dataForSeo.performance.lcp / 1000).toFixed(2)}s</div>
+                        </div>
+                        <div>
+                          <div className="text-sm text-gray-600">CLS</div>
+                          <div className="text-2xl font-bold text-gray-900">{result.realMetrics.dataForSeo.performance.cls.toFixed(3)}</div>
+                        </div>
+                        <div>
+                          <div className="text-sm text-gray-600">FCP</div>
+                          <div className="text-2xl font-bold text-gray-900">{(result.realMetrics.dataForSeo.performance.fcp / 1000).toFixed(2)}s</div>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                  {result.realMetrics.dataForSeo?.backlinks && (
+                    <div className="mt-4 grid grid-cols-2 md:grid-cols-3 gap-4">
+                      <div>
+                        <div className="text-sm text-gray-600">Total Backlinks</div>
+                        <div className="text-xl font-bold text-gray-900">{result.realMetrics.dataForSeo.backlinks.total.toLocaleString()}</div>
+                      </div>
+                      <div>
+                        <div className="text-sm text-gray-600">Referring Domains</div>
+                        <div className="text-xl font-bold text-gray-900">{result.realMetrics.dataForSeo.backlinks.referringDomains.toLocaleString()}</div>
+                      </div>
+                      <div>
+                        <div className="text-sm text-gray-600">Follow Links</div>
+                        <div className="text-xl font-bold text-gray-900">{result.realMetrics.dataForSeo.backlinks.followLinks.toLocaleString()}</div>
+                      </div>
+                    </div>
+                  )}
+                  {result.realMetrics.dataForSeo?.rankings && result.realMetrics.dataForSeo.rankings.length > 0 && (
+                    <div className="mt-4">
+                      <h4 className="text-sm font-semibold text-gray-700 mb-2">Top Ranking Keywords</h4>
+                      <div className="space-y-1">
+                        {result.realMetrics.dataForSeo.rankings.slice(0, 5).map((rank: any, idx: number) => (
+                          <div key={idx} className="flex justify-between text-sm">
+                            <span className="text-gray-700">{rank.keyword}</span>
+                            <span className="text-gray-600">#{rank.position} ({rank.searchVolume.toLocaleString()} searches/mo)</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
 
               <div className="grid grid-cols-1 gap-6">
                 {result.seoIssues && result.seoIssues.length > 0 && (

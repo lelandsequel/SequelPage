@@ -33,7 +33,7 @@ export function SecurityScanner({ onBack }: SecurityScannerProps) {
       const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
       const response = await fetch(
-        `${supabaseUrl}/functions/v1/analyze-claude`,
+        `${supabaseUrl}/functions/v1/comprehensive-security-audit`,
         {
           method: 'POST',
           headers: {
@@ -41,7 +41,6 @@ export function SecurityScanner({ onBack }: SecurityScannerProps) {
             'Authorization': `Bearer ${supabaseKey}`,
           },
           body: JSON.stringify({
-            type: 'security',
             url,
             htmlSource,
           }),
@@ -184,6 +183,56 @@ export function SecurityScanner({ onBack }: SecurityScannerProps) {
                   Export JSON
                 </Button>
               </div>
+
+              {result.realSecurityData && (
+                <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                  <h3 className="text-lg font-bold text-gray-900 mb-3">Security Headers Analysis</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <h4 className="text-sm font-semibold text-green-700 mb-2">Present Headers ({result.realSecurityData.securityHeaders.presentHeaders?.length || 0})</h4>
+                      <ul className="space-y-1">
+                        {result.realSecurityData.securityHeaders.presentHeaders?.map((header: string, idx: number) => (
+                          <li key={idx} className="text-sm text-gray-700">✓ {header}</li>
+                        ))}
+                      </ul>
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-semibold text-red-700 mb-2">Missing Headers ({result.realSecurityData.securityHeaders.missingHeaders?.length || 0})</h4>
+                      <ul className="space-y-1">
+                        {result.realSecurityData.securityHeaders.missingHeaders?.map((header: any, idx: number) => (
+                          <li key={idx} className="text-sm text-gray-700">✗ {header.header}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                  <div className="mt-4 flex items-center space-x-2">
+                    {result.realSecurityData.https ? (
+                      <span className="px-3 py-1 bg-green-100 text-green-800 rounded text-sm font-medium">HTTPS Enabled ✓</span>
+                    ) : (
+                      <span className="px-3 py-1 bg-red-100 text-red-800 rounded text-sm font-medium">HTTPS Missing ✗</span>
+                    )}
+                  </div>
+                  {result.realSecurityData.commonVulnerabilities && result.realSecurityData.commonVulnerabilities.length > 0 && (
+                    <div className="mt-4">
+                      <h4 className="text-sm font-semibold text-gray-700 mb-2">Common Vulnerabilities Detected</h4>
+                      <div className="space-y-2">
+                        {result.realSecurityData.commonVulnerabilities.map((vuln: any, idx: number) => (
+                          <div key={idx} className="p-2 bg-white rounded border border-red-200">
+                            <div className="flex justify-between items-start">
+                              <span className="text-sm font-medium text-gray-900">{vuln.type}</span>
+                              <span className={`px-2 py-0.5 text-xs rounded ${getSeverityColor(vuln.severity)}`}>
+                                {vuln.severity}
+                              </span>
+                            </div>
+                            <p className="text-xs text-gray-600 mt-1">{vuln.description}</p>
+                            {vuln.cve && <span className="text-xs text-blue-600 mt-1 inline-block">{vuln.cve}</span>}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {result.vulnerabilities && result.vulnerabilities.length > 0 && (
                 <div className="mb-8">
