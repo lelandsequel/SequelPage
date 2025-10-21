@@ -225,7 +225,9 @@ Return ONLY JSON, no markdown.`;
     });
 
     if (!response.ok) {
-      throw new Error(`Anthropic API error: ${response.status}`);
+      const errorText = await response.text();
+      console.error(`Anthropic API error ${response.status}:`, errorText);
+      throw new Error(`Anthropic API error: ${response.status} - ${errorText.substring(0, 200)}`);
     }
 
     const data = await response.json();
@@ -238,13 +240,7 @@ Return ONLY JSON, no markdown.`;
     return JSON.parse(content);
   } catch (error) {
     console.error('Claude analysis error:', error);
-    return {
-      score: 0,
-      grade: 'F',
-      error: 'Failed to analyze with Claude',
-      seoIssues: [],
-      aeoOptimizations: [],
-    };
+    throw error;
   }
 }
 
