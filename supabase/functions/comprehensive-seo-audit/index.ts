@@ -262,7 +262,7 @@ Deno.serve(async (req: Request) => {
 
     const anthropicKey = Deno.env.get("ANTHROPIC_API_KEY");
     const dataForSeoKey = Deno.env.get("DATAFORSEO_API_KEY");
-    const googleApiKey = Deno.env.get("GOOGLE_API_KEY");
+    const googleApiKey = Deno.env.get("GOOGLE_PSI_API_KEY");
 
     if (!anthropicKey) {
       throw new Error("ANTHROPIC_API_KEY not configured");
