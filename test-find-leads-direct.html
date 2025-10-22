@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Find Leads Direct</title>
+</head>
+<body>
+  <h1>Test Find Leads Function</h1>
+  <button onclick="testFindLeads()">Test Find Leads</button>
+  <pre id="output"></pre>
+
+  <script>
+    async function testFindLeads() {
+      const output = document.getElementById('output');
+      output.textContent = 'Testing...';
+
+      try {
+        const response = await fetch('https://ebdwtjdizsdfanjaihnz.supabase.co/functions/v1/find-leads', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImViZHd0amRpenNkZmFuamFpaG56Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2MDk5MjM4NSwiZXhwIjoyMDc2NTY4Mzg1fQ.6u1gFgF5oIFwGKOFZMsA_wSzXDKGxWP7o1OpN7ihRes',
+          },
+          body: JSON.stringify({
+            geography: 'Test City ABC',
+            industry: 'Test Industry XYZ',
+            maxResults: 1
+          })
+        });
+
+        const data = await response.json();
+        output.textContent = JSON.stringify(data, null, 2);
+
+        // Now check if it was saved to database
+        console.log('Checking database...');
+
+        const { createClient } = window.supabase;
+        const supabase = createClient(
+          'https://ebdwtjdizsdfanjaihnz.supabase.co',
+          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImViZHd0amRpenNkZmFuamFpaG56Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2MDk5MjM4NSwiZXhwIjoyMDc2NTY4Mzg1fQ.6u1gFgF5oIFwGKOFZMsA_wSzXDKGxWP7o1OpN7ihRes'
+        );
+
+        const { data: dbData, error } = await supabase
+          .from('leads')
+          .select('*')
+          .eq('geography', 'Test City ABC')
+          .order('created_at', { ascending: false });
+
+        output.textContent += '\n\n=== DATABASE CHECK ===\n';
+        output.textContent += 'Error: ' + JSON.stringify(error, null, 2) + '\n';
+        output.textContent += 'Data: ' + JSON.stringify(dbData, null, 2);
+
+      } catch (error) {
+        output.textContent = 'Error: ' + error.message;
+        console.error(error);
+      }
+    }
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</body>
+</html>
