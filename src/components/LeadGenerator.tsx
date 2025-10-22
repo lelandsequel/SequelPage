@@ -556,6 +556,11 @@ export function LeadGenerator({ onBack }: LeadGeneratorProps) {
                             {lead.priority}
                           </span>
                         )}
+                        {lead.created_at && (
+                          <span className="text-xs text-gray-500">
+                            {new Date(lead.created_at).toLocaleString()}
+                          </span>
+                        )}
                       </div>
                       {lead.website && (
                         <a
