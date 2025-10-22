@@ -35,14 +35,21 @@ A comprehensive professional audit and content generation suite built for C&L St
 - Email delivery of reports
 - Campaign management dashboard
 
+### Client Management
+- Multi-client portal system
+- Client user account creation
+- Report assignment and access control
+- Secure client dashboards
+
 ## Tech Stack
 
 - **Frontend**: React 18 + TypeScript + Vite
 - **Styling**: Tailwind CSS
 - **Database**: Supabase (PostgreSQL)
-- **AI Integration**: Claude 3.5 Sonnet & GPT-4o
+- **AI Integration**: Haiku 4.5 & GPT-5
 - **Backend**: Supabase Edge Functions
 - **Icons**: Lucide React
+- **Authentication**: Supabase Auth (Email/Password)
 
 ## Getting Started
 
@@ -51,6 +58,9 @@ A comprehensive professional audit and content generation suite built for C&L St
 - Node.js 18+
 - npm or yarn
 - Supabase account
+- Anthropic API key (for Claude Haiku 4.5)
+- OpenAI API key (for GPT-5)
+- DataForSEO API credentials (for SEO metrics)
 
 ### Installation
 
@@ -66,7 +76,7 @@ npm install
 ```
 
 3. Set up environment variables:
-Create a `.env` file with your Supabase credentials:
+Create a `.env` file with your credentials:
 ```env
 VITE_SUPABASE_URL=your_supabase_url
 VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
@@ -86,6 +96,8 @@ npm run build
 
 The application uses Supabase with the following main tables:
 
+- `admin_users` - Admin user accounts with role-based access
+- `client_users` - Client portal user accounts
 - `leads` - Stores discovered business leads with SEO metrics
 - `seo_audits` - SEO audit results and recommendations
 - `security_scans` - Security vulnerability scan results
@@ -102,10 +114,14 @@ The platform leverages Supabase Edge Functions for backend processing:
 - `analyze-claude` - Claude AI integration for analysis
 - `analyze-industry` - Industry analysis processing
 - `automated-lead-discovery` - Weekly automated lead finding
-- `enrich-lead-metrics` - Lead data enrichment
+- `comprehensive-seo-audit` - Full SEO audit processing
+- `comprehensive-security-audit` - Complete security scan
+- `create-client-user` - Client user account creation
+- `enrich-lead-metrics` - Lead data enrichment with DataForSEO
 - `find-leads` - Manual lead discovery
-- `generate-content` - Content generation
+- `generate-content` - Content generation with GPT-5
 - `send-campaign-report` - Email report delivery
+- `setup-admin-users` - Admin user initialization
 
 ## Available Scripts
 
@@ -117,10 +133,26 @@ The platform leverages Supabase Edge Functions for backend processing:
 
 ## Security
 
-- Password-protected access
+- Email/password authentication via Supabase Auth
 - Row Level Security (RLS) on all database tables
+- Role-based access control (Admin vs Client users)
 - Secure API key management through environment variables
 - HTTPS-only communication
+- Client data isolation and access controls
+
+## User Roles
+
+### Admin Users
+- Full access to all tools and features
+- Can create and manage client accounts
+- Can assign reports and audits to clients
+- Access to automated campaigns and lead generation
+
+### Client Users
+- Access to assigned reports and audits only
+- Cannot create new audits or reports
+- View-only access to their data
+- Secure isolated dashboard
 
 ## License
 
