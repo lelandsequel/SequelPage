@@ -17,7 +17,7 @@ type AdminPage = 'landing' | 'seo' | 'security' | 'content' | 'leads' | 'automat
 type ClientPage = 'dashboard' | 'audits' | 'scans' | 'leads' | 'content' | 'messages' | 'notifications';
 
 function AppContent() {
-  const { user, userRole, isLoading } = useAuth();
+  const { user, userRole, isLoading, signOut } = useAuth();
   const [adminPage, setAdminPage] = useState<AdminPage>('landing');
   const [clientPage, setClientPage] = useState<ClientPage>('dashboard');
   const [viewingClientId, setViewingClientId] = useState<string>('');
@@ -116,9 +116,15 @@ function AppContent() {
         <p className="text-gray-600 text-lg mb-4">
           Your account is not properly configured
         </p>
-        <p className="text-gray-500 text-sm">
+        <p className="text-gray-500 text-sm mb-6">
           Please contact your administrator
         </p>
+        <button
+          onClick={signOut}
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+        >
+          Sign Out
+        </button>
       </div>
     </div>
   );
