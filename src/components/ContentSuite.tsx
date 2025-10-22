@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ArrowLeft, Copy, Check, FileText } from 'lucide-react';
 import { Card } from './Card';
 import { Button } from './Button';
@@ -8,17 +8,33 @@ import { supabase } from '../lib/supabase';
 
 interface ContentSuiteProps {
   onBack: () => void;
-  clientId?: string;
 }
 
 type ContentType = 'keywords' | 'press_release' | 'article';
 
-export function ContentSuite({ onBack, clientId }: ContentSuiteProps) {
+export function ContentSuite({ onBack }: ContentSuiteProps) {
   const [activeTab, setActiveTab] = useState<ContentType>('keywords');
   const [isGenerating, setIsGenerating] = useState(false);
   const [result, setResult] = useState('');
   const [error, setError] = useState('');
   const [copied, setCopied] = useState(false);
+  const [clients, setClients] = useState<Array<{ id: string; company_name: string }>>([]);
+  const [selectedClientId, setSelectedClientId] = useState<string>('');
+
+  useEffect(() => {
+    loadClients();
+  }, []);
+
+  const loadClients = async () => {
+    const { data } = await supabase
+      .from('clients')
+      .select('id, company_name')
+      .order('company_name');
+
+    if (data) {
+      setClients(data);
+    }
+  };
 
   const [keywordParams, setKeywordParams] = useState({
     industry: '',
@@ -99,7 +115,7 @@ export function ContentSuite({ onBack, clientId }: ContentSuiteProps) {
         content_type: activeTab,
         input_params: params,
         output_content: data.content,
-        client_id: clientId || null,
+        client_id: selectedClientId || null,
         metadata: { wordCount: data.content.split(/\\s+/).length },
       });
     } catch (err) {
@@ -160,6 +176,27 @@ export function ContentSuite({ onBack, clientId }: ContentSuiteProps) {
           </div>
 
           <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Assign to Client (Optional)
+              </label>
+              <select
+                value={selectedClientId}
+                onChange={(e) => setSelectedClientId(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              >
+                <option value="">No client (Admin only)</option>
+                {clients.map((client) => (
+                  <option key={client.id} value={client.id}>
+                    {client.company_name}
+                  </option>
+                ))}
+              </select>
+              <p className="mt-1 text-sm text-gray-500">
+                Select a client to share this content in their portal
+              </p>
+            </div>
+
             {activeTab === 'keywords' && (
               <>
                 <Input

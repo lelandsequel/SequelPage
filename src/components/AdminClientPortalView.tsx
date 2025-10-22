@@ -66,7 +66,7 @@ export function AdminClientPortalView({ clientId, clientName, onBack }: AdminCli
   }
 
   if (activeView === 'scans') {
-    return <SecurityScanner clientId={clientId} onBack={() => setActiveView('dashboard')} />;
+    return <SecurityScanner onBack={() => setActiveView('dashboard')} />;
   }
 
   if (activeView === 'leads') {
@@ -74,7 +74,7 @@ export function AdminClientPortalView({ clientId, clientName, onBack }: AdminCli
   }
 
   if (activeView === 'content') {
-    return <ContentSuite clientId={clientId} onBack={() => setActiveView('dashboard')} />;
+    return <ContentSuite onBack={() => setActiveView('dashboard')} />;
   }
 
   const features = [
