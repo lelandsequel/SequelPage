@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ArrowLeft, Plus, Edit, Users, Mail, Phone, Globe, X } from 'lucide-react';
+import { ArrowLeft, Plus, Edit, Users, Mail, Phone, Globe, X, Key } from 'lucide-react';
 import { Card } from './Card';
 import { Button } from './Button';
 import { Input } from './Input';
@@ -27,6 +27,11 @@ export function AdminClientManager({ onBack }: AdminClientManagerProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [showAddClient, setShowAddClient] = useState(false);
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
+  const [showCreateUser, setShowCreateUser] = useState(false);
+  const [userEmail, setUserEmail] = useState('');
+  const [userPassword, setUserPassword] = useState('');
+  const [createUserClientId, setCreateUserClientId] = useState<string | null>(null);
+  const [userCreationStatus, setUserCreationStatus] = useState('');
   const [formData, setFormData] = useState({
     company_name: '',
     industry: '',
@@ -125,6 +130,52 @@ export function AdminClientManager({ onBack }: AdminClientManagerProps) {
       case 'professional': return 'bg-blue-100 text-blue-800';
       case 'starter': return 'bg-gray-100 text-gray-800';
       default: return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  const handleCreateUser = (client: Client) => {
+    setCreateUserClientId(client.id);
+    setUserEmail(client.contact_email);
+    setUserPassword('');
+    setUserCreationStatus('');
+    setShowCreateUser(true);
+  };
+
+  const submitCreateUser = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setUserCreationStatus('Creating...');
+
+    try {
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: userEmail,
+        password: userPassword,
+      });
+
+      if (authError) throw authError;
+
+      if (authData.user) {
+        const { error: dbError } = await supabase
+          .from('client_users')
+          .insert({
+            id: authData.user.id,
+            client_id: createUserClientId,
+            email: userEmail,
+            is_active: true,
+          });
+
+        if (dbError) throw dbError;
+
+        setUserCreationStatus('User created successfully!');
+        setTimeout(() => {
+          setShowCreateUser(false);
+          setUserEmail('');
+          setUserPassword('');
+          setCreateUserClientId(null);
+          setUserCreationStatus('');
+        }, 2000);
+      }
+    } catch (err) {
+      setUserCreationStatus(`Error: ${err instanceof Error ? err.message : 'Failed to create user'}`);
     }
   };
 
@@ -337,17 +388,88 @@ export function AdminClientManager({ onBack }: AdminClientManagerProps) {
                     </p>
                   </div>
 
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    onClick={() => handleEdit(client)}
-                  >
-                    <Edit className="w-4 h-4 mr-2" />
-                    Edit
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => handleCreateUser(client)}
+                    >
+                      <Key className="w-4 h-4 mr-2" />
+                      Create User
+                    </Button>
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => handleEdit(client)}
+                    >
+                      <Edit className="w-4 h-4 mr-2" />
+                      Edit
+                    </Button>
+                  </div>
                 </div>
               </Card>
             ))}
+          </div>
+        )}
+
+        {showCreateUser && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <Card className="p-8 max-w-md w-full mx-4" glassEffect>
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-bold text-gray-900">Create Client User</h2>
+                <button
+                  onClick={() => setShowCreateUser(false)}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <form onSubmit={submitCreateUser} className="space-y-4">
+                <Input
+                  label="Email"
+                  type="email"
+                  placeholder="client@example.com"
+                  value={userEmail}
+                  onChange={(e) => setUserEmail(e.target.value)}
+                  required
+                />
+
+                <Input
+                  label="Password"
+                  type="password"
+                  placeholder="Enter password (min 6 characters)"
+                  value={userPassword}
+                  onChange={(e) => setUserPassword(e.target.value)}
+                  required
+                />
+
+                {userCreationStatus && (
+                  <div className={`p-4 rounded-lg text-sm ${
+                    userCreationStatus.includes('Error')
+                      ? 'bg-red-50 border border-red-200 text-red-700'
+                      : userCreationStatus.includes('successfully')
+                      ? 'bg-green-50 border border-green-200 text-green-700'
+                      : 'bg-blue-50 border border-blue-200 text-blue-700'
+                  }`}>
+                    {userCreationStatus}
+                  </div>
+                )}
+
+                <div className="flex gap-3 pt-4">
+                  <Button type="submit" className="flex-1">
+                    Create User
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    onClick={() => setShowCreateUser(false)}
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              </form>
+            </Card>
           </div>
         )}
       </div>
