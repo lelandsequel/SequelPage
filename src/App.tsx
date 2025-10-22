@@ -11,14 +11,17 @@ import { ClientDashboard } from './components/ClientDashboard';
 import { ClientAuditsView } from './components/ClientAuditsView';
 import { ClientLeadsView } from './components/ClientLeadsView';
 import { AdminClientManager } from './components/AdminClientManager';
+import { AdminClientPortalView } from './components/AdminClientPortalView';
 
-type AdminPage = 'landing' | 'seo' | 'security' | 'content' | 'leads' | 'automated' | 'clients';
+type AdminPage = 'landing' | 'seo' | 'security' | 'content' | 'leads' | 'automated' | 'clients' | 'client-portal';
 type ClientPage = 'dashboard' | 'audits' | 'scans' | 'leads' | 'content' | 'messages' | 'notifications';
 
 function AppContent() {
   const { user, userRole, isLoading } = useAuth();
   const [adminPage, setAdminPage] = useState<AdminPage>('landing');
   const [clientPage, setClientPage] = useState<ClientPage>('dashboard');
+  const [viewingClientId, setViewingClientId] = useState<string>('');
+  const [viewingClientName, setViewingClientName] = useState<string>('');
 
   if (isLoading) {
     return (
@@ -49,7 +52,24 @@ function AppContent() {
         case 'automated':
           return <AutomatedCampaigns onBack={() => setAdminPage('landing')} />;
         case 'clients':
-          return <AdminClientManager onBack={() => setAdminPage('landing')} />;
+          return (
+            <AdminClientManager
+              onBack={() => setAdminPage('landing')}
+              onViewClientPortal={(clientId, clientName) => {
+                setViewingClientId(clientId);
+                setViewingClientName(clientName);
+                setAdminPage('client-portal');
+              }}
+            />
+          );
+        case 'client-portal':
+          return (
+            <AdminClientPortalView
+              clientId={viewingClientId}
+              clientName={viewingClientName}
+              onBack={() => setAdminPage('clients')}
+            />
+          );
         default:
           return <LandingPage onNavigate={(page) => setAdminPage(page as AdminPage)} />;
       }

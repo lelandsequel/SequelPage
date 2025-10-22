@@ -7,6 +7,7 @@ import { supabase } from '../lib/supabase';
 
 interface ClientAuditsViewProps {
   onBack: () => void;
+  clientId?: string;
 }
 
 interface Audit {
@@ -20,14 +21,17 @@ interface Audit {
   recommendations: any[];
 }
 
-export function ClientAuditsView({ onBack }: ClientAuditsViewProps) {
-  const { clientId } = useAuth();
+export function ClientAuditsView({ onBack, clientId: propClientId }: ClientAuditsViewProps) {
+  const { clientId: authClientId } = useAuth();
+  const clientId = propClientId || authClientId;
   const [audits, setAudits] = useState<Audit[]>([]);
   const [selectedAudit, setSelectedAudit] = useState<Audit | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    loadAudits();
+    if (clientId) {
+      loadAudits();
+    }
   }, [clientId]);
 
   const loadAudits = async () => {

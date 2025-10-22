@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ArrowLeft, Plus, Edit, Users, Mail, Phone, Globe, X, Key } from 'lucide-react';
+import { ArrowLeft, Plus, Edit, Users, Mail, Phone, Globe, X, Key, Eye } from 'lucide-react';
 import { Card } from './Card';
 import { Button } from './Button';
 import { Input } from './Input';
@@ -7,6 +7,7 @@ import { supabase } from '../lib/supabase';
 
 interface AdminClientManagerProps {
   onBack: () => void;
+  onViewClientPortal?: (clientId: string, clientName: string) => void;
 }
 
 interface Client {
@@ -22,7 +23,7 @@ interface Client {
   created_at: string;
 }
 
-export function AdminClientManager({ onBack }: AdminClientManagerProps) {
+export function AdminClientManager({ onBack, onViewClientPortal }: AdminClientManagerProps) {
   const [clients, setClients] = useState<Client[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showAddClient, setShowAddClient] = useState(false);
@@ -32,6 +33,8 @@ export function AdminClientManager({ onBack }: AdminClientManagerProps) {
   const [userPassword, setUserPassword] = useState('');
   const [createUserClientId, setCreateUserClientId] = useState<string | null>(null);
   const [userCreationStatus, setUserCreationStatus] = useState('');
+  const [viewingClientId, setViewingClientId] = useState<string | null>(null);
+  const [viewingClientName, setViewingClientName] = useState<string>('');
   const [formData, setFormData] = useState({
     company_name: '',
     industry: '',
@@ -389,6 +392,14 @@ export function AdminClientManager({ onBack }: AdminClientManagerProps) {
                   </div>
 
                   <div className="flex gap-2">
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => onViewClientPortal?.(client.id, client.company_name)}
+                    >
+                      <Eye className="w-4 h-4 mr-2" />
+                      View Portal
+                    </Button>
                     <Button
                       variant="secondary"
                       size="sm"

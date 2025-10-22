@@ -6,6 +6,7 @@ import { supabase } from '../lib/supabase';
 
 interface ClientLeadsViewProps {
   onBack: () => void;
+  clientId?: string;
 }
 
 interface Lead {
@@ -26,13 +27,16 @@ interface Lead {
   created_at: string;
 }
 
-export function ClientLeadsView({ onBack }: ClientLeadsViewProps) {
-  const { clientId } = useAuth();
+export function ClientLeadsView({ onBack, clientId: propClientId }: ClientLeadsViewProps) {
+  const { clientId: authClientId } = useAuth();
+  const clientId = propClientId || authClientId;
   const [leads, setLeads] = useState<Lead[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    loadLeads();
+    if (clientId) {
+      loadLeads();
+    }
   }, [clientId]);
 
   const loadLeads = async () => {
