@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Make Me Admin</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body style="font-family: sans-serif; padding: 40px; max-width: 600px; margin: 0 auto;">
+  <h1>Make Me Admin</h1>
+  <p>This will add your current logged-in account to the admin_users table.</p>
+
+  <div id="status" style="margin: 20px 0; padding: 15px; border-radius: 5px; display: none;"></div>
+
+  <button onclick="makeAdmin()" style="padding: 10px 20px; font-size: 16px; cursor: pointer;">
+    Make Me Admin
+  </button>
+
+  <script>
+    const supabase = window.supabase.createClient(
+      'https://ebdwtjdizsdfanjaihnz.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImViZHd0amRpenNkZmFuamFpaG56Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA5OTIzODUsImV4cCI6MjA3NjU2ODM4NX0._hbBUdagU4EjrvpXKeOC61lXQllQX0yjdMTEPliSG3w'
+    );
+
+    async function makeAdmin() {
+      const status = document.getElementById('status');
+      status.style.display = 'block';
+      status.style.background = '#f0f0f0';
+      status.textContent = 'Working...';
+
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+
+        if (!user) {
+          status.style.background = '#fee';
+          status.textContent = 'Error: Not logged in. Please log in first at the main app.';
+          return;
+        }
+
+        const { error } = await supabase
+          .from('admin_users')
+          .insert({
+            id: user.id,
+            email: user.email,
+            full_name: 'Admin User',
+            role: 'admin',
+            is_active: true
+          });
+
+        if (error) {
+          if (error.message.includes('duplicate') || error.message.includes('already exists')) {
+            status.style.background = '#efe';
+            status.textContent = `Success! You're already an admin. Go back to the app and refresh!`;
+          } else {
+            status.style.background = '#fee';
+            status.textContent = `Error: ${error.message}`;
+          }
+        } else {
+          status.style.background = '#efe';
+          status.textContent = 'Success! You are now an admin. Go back to the app and refresh!';
+        }
+      } catch (err) {
+        status.style.background = '#fee';
+        status.textContent = `Error: ${err.message}`;
+      }
+    }
+  </script>
+</body>
+</html>
