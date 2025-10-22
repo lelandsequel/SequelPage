@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Find Leads API</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f5f5f5;
+            border-radius: 4px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .loading {
+            color: #666;
+        }
+        .error {
+            color: red;
+        }
+        .success {
+            color: green;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test Find Leads API</h1>
+    <button onclick="testFindLeads()">Test Find Leads (HVAC in Houston)</button>
+    <div id="result"></div>
+
+    <script>
+        async function testFindLeads() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.className = 'loading';
+            resultDiv.textContent = 'Calling find-leads API...\n\n';
+
+            const apiUrl = 'https://ebdwtjdizsdfanjaihnz.supabase.co/functions/v1/find-leads';
+            const anonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImViZHd0amRpenNkZmFuamFpaG56Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA5OTIzODUsImV4cCI6MjA3NjU2ODM4NX0._hbBUdagU4EjrvpXKeOC61lXQllQX0yjdMTEPliSG3w';
+
+            try {
+                const startTime = Date.now();
+
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${anonKey}`,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        geography: 'Houston, TX',
+                        industry: 'HVAC Services',
+                        maxResults: 5
+                    })
+                });
+
+                const endTime = Date.now();
+                const duration = ((endTime - startTime) / 1000).toFixed(2);
+
+                resultDiv.textContent += `Response Status: ${response.status}\n`;
+                resultDiv.textContent += `Duration: ${duration}s\n\n`;
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    resultDiv.className = 'success';
+                    resultDiv.textContent += `SUCCESS!\n\n`;
+                    resultDiv.textContent += `Leads Found: ${data.leads ? data.leads.length : 0}\n\n`;
+                    resultDiv.textContent += JSON.stringify(data, null, 2);
+                } else {
+                    resultDiv.className = 'error';
+                    resultDiv.textContent += `ERROR!\n\n`;
+                    resultDiv.textContent += JSON.stringify(data, null, 2);
+                }
+            } catch (error) {
+                resultDiv.className = 'error';
+                resultDiv.textContent += `EXCEPTION!\n\n${error.message}`;
+            }
+        }
+    </script>
+</body>
+</html>
