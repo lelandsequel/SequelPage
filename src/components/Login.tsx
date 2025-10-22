@@ -10,18 +10,26 @@ export function Login() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const { signIn } = useAuth();
+  const [isSignUp, setIsSignUp] = useState(false);
+  const { signIn, signUp } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setIsLoading(true);
 
-    const { error: signInError } = await signIn(email, password);
-
-    if (signInError) {
-      setError(signInError.message || 'Invalid email or password');
-      setIsLoading(false);
+    if (isSignUp) {
+      const { error: signUpError } = await signUp(email, password);
+      if (signUpError) {
+        setError(signUpError.message || 'Failed to create account');
+        setIsLoading(false);
+      }
+    } else {
+      const { error: signInError } = await signIn(email, password);
+      if (signInError) {
+        setError(signInError.message || 'Invalid email or password');
+        setIsLoading(false);
+      }
     }
   };
 
@@ -33,10 +41,10 @@ export function Login() {
             <Lock className="w-8 h-8 text-blue-600" />
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Welcome to CandlPage
+            {isSignUp ? 'Create Account' : 'Welcome to CandlPage'}
           </h1>
           <p className="text-gray-600">
-            Sign in to access your dashboard
+            {isSignUp ? 'Sign up to get started' : 'Sign in to access your dashboard'}
           </p>
         </div>
 
@@ -71,9 +79,22 @@ export function Login() {
             className="w-full"
             size="lg"
           >
-            {isLoading ? 'Signing in...' : 'Sign In'}
+            {isLoading ? (isSignUp ? 'Creating account...' : 'Signing in...') : (isSignUp ? 'Sign Up' : 'Sign In')}
           </Button>
         </form>
+
+        <div className="mt-4 text-center">
+          <button
+            type="button"
+            onClick={() => {
+              setIsSignUp(!isSignUp);
+              setError('');
+            }}
+            className="text-blue-600 hover:text-blue-700 text-sm"
+          >
+            {isSignUp ? 'Already have an account? Sign in' : 'Need an account? Sign up'}
+          </button>
+        </div>
 
         <footer className="mt-8 text-center text-sm text-gray-500">
           <p>© 2025 C&L Strategy. All rights reserved.</p>

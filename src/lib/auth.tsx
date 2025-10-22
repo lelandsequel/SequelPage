@@ -9,6 +9,7 @@ interface AuthContextType {
   clientId: string | null;
   isLoading: boolean;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
+  signUp: (email: string, password: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
 }
 
@@ -19,6 +20,7 @@ const AuthContext = createContext<AuthContextType>({
   clientId: null,
   isLoading: true,
   signIn: async () => ({ error: null }),
+  signUp: async () => ({ error: null }),
   signOut: async () => {},
 });
 
@@ -103,6 +105,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
     return { error };
   };
 
+  const signUp = async (email: string, password: string) => {
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+    });
+    return { error };
+  };
+
   const signOut = async () => {
     await supabase.auth.signOut();
     setUser(null);
@@ -118,6 +128,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     clientId,
     isLoading,
     signIn,
+    signUp,
     signOut,
   };
 
