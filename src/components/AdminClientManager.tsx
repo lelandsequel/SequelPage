@@ -149,34 +149,38 @@ export function AdminClientManager({ onBack, onViewClientPortal }: AdminClientMa
     setUserCreationStatus('Creating...');
 
     try {
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: userEmail,
-        password: userPassword,
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error('Not authenticated');
+
+      const apiUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-client-user`;
+
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: userEmail,
+          password: userPassword,
+          clientId: createUserClientId,
+        }),
       });
 
-      if (authError) throw authError;
+      const result = await response.json();
 
-      if (authData.user) {
-        const { error: dbError } = await supabase
-          .from('client_users')
-          .insert({
-            id: authData.user.id,
-            client_id: createUserClientId,
-            email: userEmail,
-            is_active: true,
-          });
-
-        if (dbError) throw dbError;
-
-        setUserCreationStatus('User created successfully!');
-        setTimeout(() => {
-          setShowCreateUser(false);
-          setUserEmail('');
-          setUserPassword('');
-          setCreateUserClientId(null);
-          setUserCreationStatus('');
-        }, 2000);
+      if (!response.ok || result.error) {
+        throw new Error(result.error || 'Failed to create user');
       }
+
+      setUserCreationStatus('User created successfully!');
+      setTimeout(() => {
+        setShowCreateUser(false);
+        setUserEmail('');
+        setUserPassword('');
+        setCreateUserClientId(null);
+        setUserCreationStatus('');
+      }, 2000);
     } catch (err) {
       setUserCreationStatus(`Error: ${err instanceof Error ? err.message : 'Failed to create user'}`);
     }
