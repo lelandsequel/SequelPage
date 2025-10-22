@@ -133,7 +133,7 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
         </div>
 
         <footer className="mt-16 text-center text-sm text-gray-500">
-          <p>Powered by Claude 3.5 Sonnet & GPT-4o</p>
+          <p>Powered by Haiku 4.5 & GPT-5</p>
           <p className="mt-2">© 2025 C&L Strategy. All rights reserved.</p>
         </footer>
       </div>
