@@ -1,4 +1,4 @@
-# CandlPage
+# SequelPage
 
 A comprehensive professional audit and content generation suite built for C&L Strategy clients. This platform combines AI-powered analysis, security scanning, content creation, and automated lead generation into a single powerful toolset.
 
