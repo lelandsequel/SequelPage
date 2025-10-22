@@ -381,42 +381,11 @@ export function LeadGenerator({ onBack }: LeadGeneratorProps) {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-            <Input
-              label="Geography"
-              placeholder="e.g., Houston, TX"
-              value={geography}
-              onChange={(e) => setGeography(e.target.value)}
-            />
-            <Input
-              label="Industry"
-              placeholder="e.g., landscaping"
-              value={industry}
-              onChange={(e) => setIndustry(e.target.value)}
-            />
-            <Input
-              label="Max Results"
-              type="number"
-              placeholder="3"
-              value={maxResults}
-              onChange={(e) => setMaxResults(e.target.value)}
-            />
-          </div>
-
           {error && (
             <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 mb-4">
               {error}
             </div>
           )}
-
-          <Button
-            onClick={handleSearch}
-            isLoading={isSearching}
-            className="w-full"
-            size="lg"
-          >
-            {isSearching ? 'Analyzing Leads...' : 'Find Leads'}
-          </Button>
         </Card>
 
         {showBulkImport && (
