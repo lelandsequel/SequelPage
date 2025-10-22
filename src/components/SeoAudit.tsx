@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ArrowLeft, Download, Copy, Check } from 'lucide-react';
 import { Card } from './Card';
 import { Button } from './Button';
@@ -17,6 +17,23 @@ export function SeoAudit({ onBack }: SeoAuditProps) {
   const [result, setResult] = useState<any>(null);
   const [error, setError] = useState('');
   const [copiedItems, setCopiedItems] = useState<Set<string>>(new Set());
+  const [clients, setClients] = useState<Array<{ id: string; company_name: string }>>([]);
+  const [selectedClientId, setSelectedClientId] = useState<string>('');
+
+  useEffect(() => {
+    loadClients();
+  }, []);
+
+  const loadClients = async () => {
+    const { data } = await supabase
+      .from('clients')
+      .select('id, company_name')
+      .order('company_name');
+
+    if (data) {
+      setClients(data);
+    }
+  };
 
   const handleAnalyze = async () => {
     if (!url && !htmlSource) {
@@ -72,6 +89,7 @@ export function SeoAudit({ onBack }: SeoAuditProps) {
         technical_seo: data.technicalSeo || {},
         content_gaps: data.contentGaps || [],
         recommendations: data.recommendations || [],
+        client_id: selectedClientId || null,
       });
     } catch (err) {
       console.error('Analysis error:', err);
@@ -147,6 +165,27 @@ export function SeoAudit({ onBack }: SeoAuditProps) {
           <p className="text-gray-600 mb-6">Comprehensive website analysis with actionable recommendations</p>
 
           <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Assign to Client (Optional)
+              </label>
+              <select
+                value={selectedClientId}
+                onChange={(e) => setSelectedClientId(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                <option value="">No client (Admin only)</option>
+                {clients.map((client) => (
+                  <option key={client.id} value={client.id}>
+                    {client.company_name}
+                  </option>
+                ))}
+              </select>
+              <p className="mt-1 text-sm text-gray-500">
+                Select a client to share this audit in their portal
+              </p>
+            </div>
+
             <Input
               label="Website URL"
               placeholder="https://example.com"
