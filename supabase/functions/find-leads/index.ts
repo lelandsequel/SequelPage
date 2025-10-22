@@ -290,9 +290,10 @@ Deno.serve(async (req: Request) => {
     }
 
     if (leads.length === 0) {
+      console.log('No Google API key found or no results. Using demo data.');
       const numLeads = Math.min(maxResults, 3);
       for (let i = 0; i < numLeads; i++) {
-        const demoWebsite = `https://example-${i}.com`;
+        const demoWebsite = `https://example-${industry.toLowerCase().replace(/\s+/g, '-')}-${i}.com`;
         const analysis = await analyzeWebsite(demoWebsite);
 
         const lead: Lead = {
@@ -328,6 +329,40 @@ Deno.serve(async (req: Request) => {
           lead.notes = 'Moderate SEO opportunity';
         } else {
           lead.notes = 'Well-optimized site';
+        }
+
+        const { data: insertedLead, error: insertError } = await supabase.from('leads').insert({
+          business_name: lead.business_name,
+          website: lead.website,
+          phone: lead.phone,
+          address: lead.address,
+          city: lead.city,
+          tech_stack: lead.tech_stack,
+          core_web_vitals_lcp: lead.core_web_vitals_lcp,
+          has_schema: lead.has_schema,
+          has_faq: lead.has_faq,
+          has_org: lead.has_org,
+          meta_title_ok: lead.meta_title_ok,
+          meta_desc_ok: lead.meta_desc_ok,
+          content_fresh_months: lead.content_fresh_months,
+          traffic_trend: lead.traffic_trend,
+          domain_rank: lead.domain_rank,
+          backlinks_count: lead.backlinks_count,
+          referring_domains: lead.referring_domains,
+          organic_traffic: lead.organic_traffic,
+          issues: lead.issues,
+          score: lead.score,
+          notes: lead.notes,
+          source: lead.source,
+          analysis_status: 'basic',
+        }).select();
+
+        if (insertedLead && insertedLead[0]) {
+          lead.id = insertedLead[0].id;
+        }
+
+        if (insertError) {
+          console.error('Error inserting demo lead:', insertError);
         }
 
         leads.push(lead);
