@@ -8,11 +8,12 @@ import { supabase } from '../lib/supabase';
 
 interface ContentSuiteProps {
   onBack: () => void;
+  clientId?: string;
 }
 
 type ContentType = 'keywords' | 'press_release' | 'article';
 
-export function ContentSuite({ onBack }: ContentSuiteProps) {
+export function ContentSuite({ onBack, clientId }: ContentSuiteProps) {
   const [activeTab, setActiveTab] = useState<ContentType>('keywords');
   const [isGenerating, setIsGenerating] = useState(false);
   const [result, setResult] = useState('');
@@ -98,6 +99,7 @@ export function ContentSuite({ onBack }: ContentSuiteProps) {
         content_type: activeTab,
         input_params: params,
         output_content: data.content,
+        client_id: clientId || null,
         metadata: { wordCount: data.content.split(/\\s+/).length },
       });
     } catch (err) {

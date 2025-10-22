@@ -8,9 +8,10 @@ import { supabase } from '../lib/supabase';
 
 interface SecurityScannerProps {
   onBack: () => void;
+  clientId?: string;
 }
 
-export function SecurityScanner({ onBack }: SecurityScannerProps) {
+export function SecurityScanner({ onBack, clientId }: SecurityScannerProps) {
   const [url, setUrl] = useState('');
   const [htmlSource, setHtmlSource] = useState('');
   const [isScanning, setIsScanning] = useState(false);
@@ -61,6 +62,7 @@ export function SecurityScanner({ onBack }: SecurityScannerProps) {
         vulnerabilities: data.vulnerabilities || [],
         fixes: data.fixes || [],
         strategic_report: data.strategicReport || {},
+        client_id: clientId || null,
       });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Security scan failed');

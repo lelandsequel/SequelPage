@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
-import { ArrowLeft, FileText, Shield, Users, Trash2 } from 'lucide-react';
+import { ArrowLeft, FileText, Shield, Users, Trash2, Sparkles } from 'lucide-react';
 import { Card } from './Card';
 import { Button } from './Button';
 import { supabase } from '../lib/supabase';
 import { ClientAuditsView } from './ClientAuditsView';
 import { ClientLeadsView } from './ClientLeadsView';
+import { SecurityScanner } from './SecurityScanner';
+import { ContentSuite } from './ContentSuite';
 
 interface AdminClientPortalViewProps {
   clientId: string;
@@ -28,7 +30,7 @@ export function AdminClientPortalView({ clientId, clientName, onBack }: AdminCli
   });
   const [clientInfo, setClientInfo] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [activeView, setActiveView] = useState<'dashboard' | 'audits' | 'leads'>('dashboard');
+  const [activeView, setActiveView] = useState<'dashboard' | 'audits' | 'scans' | 'leads' | 'content'>('dashboard');
 
   useEffect(() => {
     loadClientData();
@@ -63,8 +65,16 @@ export function AdminClientPortalView({ clientId, clientName, onBack }: AdminCli
     return <ClientAuditsView clientId={clientId} onBack={() => setActiveView('dashboard')} />;
   }
 
+  if (activeView === 'scans') {
+    return <SecurityScanner clientId={clientId} onBack={() => setActiveView('dashboard')} />;
+  }
+
   if (activeView === 'leads') {
     return <ClientLeadsView clientId={clientId} onBack={() => setActiveView('dashboard')} />;
+  }
+
+  if (activeView === 'content') {
+    return <ContentSuite clientId={clientId} onBack={() => setActiveView('dashboard')} />;
   }
 
   const features = [
@@ -91,6 +101,14 @@ export function AdminClientPortalView({ clientId, clientName, onBack }: AdminCli
       icon: Users,
       color: 'from-cyan-500 to-cyan-600',
       count: stats.leads,
+    },
+    {
+      id: 'content',
+      title: 'Generated Content',
+      description: 'View and manage generated content',
+      icon: Sparkles,
+      color: 'from-purple-500 to-purple-600',
+      count: stats.content,
     },
   ];
 
@@ -147,7 +165,9 @@ export function AdminClientPortalView({ clientId, clientName, onBack }: AdminCli
                 glassEffect
                 onClick={() => {
                   if (feature.id === 'audits') setActiveView('audits');
+                  if (feature.id === 'scans') setActiveView('scans');
                   if (feature.id === 'leads') setActiveView('leads');
+                  if (feature.id === 'content') setActiveView('content');
                 }}
               >
                 <div className={`w-12 h-12 rounded-lg bg-gradient-to-br ${feature.color} flex items-center justify-center mb-4`}>
