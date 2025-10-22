@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CandlPage User Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        header {
+            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+            color: white;
+            padding: 3rem 2rem;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        nav {
+            background: #1e293b;
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        nav a:hover {
+            color: #3b82f6;
+        }
+
+        main {
+            padding: 2rem;
+        }
+
+        section {
+            margin-bottom: 4rem;
+        }
+
+        h2 {
+            font-size: 2rem;
+            color: #1e40af;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 3px solid #3b82f6;
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            color: #334155;
+            margin: 2rem 0 1rem;
+        }
+
+        h4 {
+            font-size: 1.2rem;
+            color: #475569;
+            margin: 1.5rem 0 0.75rem;
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        ul, ol {
+            margin-left: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        .card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+
+        .card h4 {
+            margin-top: 0;
+            color: #1e40af;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            border-left: 4px solid;
+        }
+
+        .alert-info {
+            background: #dbeafe;
+            border-color: #3b82f6;
+            color: #1e40af;
+        }
+
+        .alert-warning {
+            background: #fef3c7;
+            border-color: #f59e0b;
+            color: #92400e;
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            border-color: #10b981;
+            color: #065f46;
+        }
+
+        .score-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        .score-table th,
+        .score-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .score-table th {
+            background: #1e40af;
+            color: white;
+            font-weight: 600;
+        }
+
+        .score-table tr:hover {
+            background: #f8fafc;
+        }
+
+        .step {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 0.5rem 0;
+            display: flex;
+            gap: 1rem;
+        }
+
+        .step-number {
+            background: #3b82f6;
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .step-content {
+            flex: 1;
+        }
+
+        .step-content strong {
+            color: #1e40af;
+        }
+
+        footer {
+            background: #1e293b;
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 4rem;
+        }
+
+        @media (max-width: 768px) {
+            nav ul {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            header h1 {
+                font-size: 2rem;
+            }
+
+            main {
+                padding: 1rem;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+            }
+        }
+
+        @media print {
+            nav {
+                display: none;
+            }
+
+            .container {
+                box-shadow: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>CandlPage User Guide</h1>
+            <p>Complete instructions for operating the CandlPage platform</p>
+        </header>
+
+        <nav>
+            <ul>
+                <li><a href="#getting-started">Getting Started</a></li>
+                <li><a href="#dashboard">Dashboard</a></li>
+                <li><a href="#seo-audit">SEO Audit</a></li>
+                <li><a href="#security">Security Scanner</a></li>
+                <li><a href="#content">Content Suite</a></li>
+                <li><a href="#leads">Lead Generator</a></li>
+                <li><a href="#automated">Automated Discovery</a></li>
+                <li><a href="#clients">Client Management</a></li>
+                <li><a href="#tips">Tips & Best Practices</a></li>
+                <li><a href="#troubleshooting">Troubleshooting</a></li>
+            </ul>
+        </nav>
+
+        <main>
+            <section id="getting-started">
+                <h2>Getting Started</h2>
+
+                <h3>Logging In</h3>
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">Navigate to the CandlPage URL</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">Enter your email address and password</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">Click "Sign In"</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <div class="step-content">You'll be directed to either the <strong>Admin Dashboard</strong> or <strong>Client Portal</strong></div>
+                </div>
+
+                <div class="alert alert-info">
+                    <strong>First Time Setup:</strong> Admin users should review all available tools, set up automated campaigns if needed, and create client accounts for portal access.
+                </div>
+            </section>
+
+            <section id="dashboard">
+                <h2>Admin Dashboard Overview</h2>
+                <p>The admin dashboard provides access to six main tools, each displayed as a tool card with an icon, title, description, features list, and launch button.</p>
+
+                <div class="card">
+                    <h4>Navigation Tips</h4>
+                    <ul>
+                        <li>Click any "Launch Tool" button to open that tool</li>
+                        <li>Use the "Sign Out" button in the top right to log out</li>
+                        <li>System status indicator shows operational status</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="seo-audit">
+                <h2>SEO/AEO Audit Tool</h2>
+                <p>Generate comprehensive SEO and Answer Engine Optimization audits for any website.</p>
+
+                <h3>Running an Audit</h3>
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <strong>Enter Website URL</strong><br>
+                        Click on "SEO/AEO Audit" from the dashboard, enter the full URL (e.g., https://example.com), and click "Run Audit"
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <strong>Wait for Analysis</strong><br>
+                        The audit typically takes 30-60 seconds. Progress indicator shows status while AI analyzes technical SEO, content, and AEO factors.
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <strong>Review Results</strong><br>
+                        View overall score (0-100), score breakdown by category, detailed recommendations with priority levels, and implementation snippets.
+                    </div>
+                </div>
+
+                <h3>Understanding Scores</h3>
+                <table class="score-table">
+                    <thead>
+                        <tr>
+                            <th>Score Range</th>
+                            <th>Rating</th>
+                            <th>Action Needed</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>90-100</td>
+                            <td>Excellent</td>
+                            <td>Minor optimizations only</td>
+                        </tr>
+                        <tr>
+                            <td>70-89</td>
+                            <td>Good</td>
+                            <td>Some improvements recommended</td>
+                        </tr>
+                        <tr>
+                            <td>50-69</td>
+                            <td>Needs Work</td>
+                            <td>Multiple issues to address</td>
+                        </tr>
+                        <tr>
+                            <td>Below 50</td>
+                            <td>Critical</td>
+                            <td>Significant problems detected</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Categories Analyzed</h3>
+                <div class="card">
+                    <ul>
+                        <li><strong>Technical SEO:</strong> Site speed, mobile-friendliness, crawlability</li>
+                        <li><strong>On-Page SEO:</strong> Meta tags, headings, content structure</li>
+                        <li><strong>Content Quality:</strong> Keyword usage, readability, value</li>
+                        <li><strong>Answer Engine Optimization:</strong> Featured snippet potential, schema markup</li>
+                        <li><strong>User Experience:</strong> Navigation, accessibility, engagement</li>
+                    </ul>
+                </div>
+
+                <h3>Exporting Results</h3>
+                <ol>
+                    <li>Review the audit results</li>
+                    <li>Click "Export to CSV" button</li>
+                    <li>Save the file for client delivery or records</li>
+                    <li>CSV includes all recommendations and priorities</li>
+                </ol>
+
+                <h3>Assigning to Clients</h3>
+                <ol>
+                    <li>After running an audit, click "Assign to Client"</li>
+                    <li>Select the client from the dropdown</li>
+                    <li>Click "Assign"</li>
+                    <li>Client can now view this audit in their portal</li>
+                </ol>
+            </section>
+
+            <section id="security">
+                <h2>Security Scanner</h2>
+                <p>Perform comprehensive cybersecurity vulnerability assessments.</p>
+
+                <h3>Running a Security Scan</h3>
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <strong>Enter Target Information</strong><br>
+                        Click "Security Scanner" from dashboard, enter domain or IP address, optionally add specific scan parameters, and click "Run Security Scan"
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <strong>Analysis Process</strong><br>
+                        Scan takes 1-3 minutes depending on target size. Checks for common vulnerabilities, cross-references CVE database, and generates risk assessment.
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <strong>Review Findings</strong><br>
+                        View risk level, vulnerabilities found (categorized by severity), CVE references, and remediation steps.
+                    </div>
+                </div>
+
+                <h3>Severity Levels</h3>
+                <table class="score-table">
+                    <thead>
+                        <tr>
+                            <th>Severity</th>
+                            <th>Action Required</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Critical</td>
+                            <td>Immediate action required</td>
+                        </tr>
+                        <tr>
+                            <td>High</td>
+                            <td>Address as soon as possible</td>
+                        </tr>
+                        <tr>
+                            <td>Medium</td>
+                            <td>Plan for resolution</td>
+                        </tr>
+                        <tr>
+                            <td>Low</td>
+                            <td>Monitor and address when convenient</td>
+                        </tr>
+                        <tr>
+                            <td>Informational</td>
+                            <td>Best practice recommendations</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Understanding Results</h3>
+                <div class="card">
+                    <p>Each vulnerability includes:</p>
+                    <ul>
+                        <li><strong>Description:</strong> What the issue is</li>
+                        <li><strong>Impact:</strong> Potential consequences</li>
+                        <li><strong>Recommendation:</strong> How to fix it</li>
+                        <li><strong>Code Snippets:</strong> Implementation examples</li>
+                        <li><strong>Resources:</strong> Links to documentation</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="content">
+                <h2>Content Suite</h2>
+                <p>Generate AI-powered content for various marketing needs.</p>
+
+                <h3>Keyword Research</h3>
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <strong>Enter Parameters</strong><br>
+                        Industry/niche, geography (optional), target audience (optional), then click "Generate Keywords"
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <strong>Review Results</strong><br>
+                        20-30 keyword suggestions with search volume estimates, difficulty scores (1-100), search intent classification, and competitive analysis
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <strong>Export Keywords</strong><br>
+                        Click "Export to CSV" and import into SEO tools or content calendar
+                    </div>
+                </div>
+
+                <h3>Press Release Generation</h3>
+                <div class="card">
+                    <h4>Fill in Details:</h4>
+                    <ul>
+                        <li>Company name</li>
+                        <li>Announcement details</li>
+                        <li>Style preference (Professional, Casual, Technical)</li>
+                        <li>Additional context (optional)</li>
+                    </ul>
+                    <p>Complete press release appears with headline, dateline, lead, body, and boilerplate. Copy and paste into your system, edit as needed for brand voice.</p>
+                </div>
+
+                <h3>SEO Article Generation</h3>
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <strong>Set Parameters</strong><br>
+                        Topic/title, target keywords (comma-separated), tone (Professional, Casual, Technical, Friendly), length (500-3000 words)
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <strong>Content Delivery</strong><br>
+                        Full article with optimized structure, H2/H3 headings, meta description, and naturally integrated keywords
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <strong>Edit & Refine</strong><br>
+                        Review for accuracy, adjust tone, add brand-specific details, export or copy content
+                    </div>
+                </div>
+
+                <div class="alert alert-warning">
+                    <strong>Best Practices:</strong> Be specific with prompts for better results. Always review AI content before publishing. Customize for brand voice. Verify facts and statistics. Add unique insights and examples.
+                </div>
+            </section>
+
+            <section id="leads">
+                <h2>Lead Generator</h2>
+                <p>Discover high-quality business leads with detailed opportunity scoring.</p>
+
+                <h3>Finding Leads</h3>
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <strong>Enter Search Criteria</strong><br>
+                        Industry/vertical, geographic location (optional), company size (optional), other filters, then click "Find Leads"
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <strong>Analysis Process</strong><br>
+                        AI searches for businesses matching criteria, analyzes websites for opportunity indicators, scores SEO performance, and identifies improvement opportunities (takes 2-5 minutes per batch)
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <strong>Review Lead List</strong><br>
+                        Company name and website, SEO score (0-100), opportunity score, key findings, contact potential
+                    </div>
+                </div>
+
+                <h3>Understanding Lead Scores</h3>
+                <div class="card">
+                    <h4>SEO Score Components:</h4>
+                    <ul>
+                        <li>Technical SEO health</li>
+                        <li>Content quality</li>
+                        <li>Mobile optimization</li>
+                        <li>Page speed</li>
+                        <li>Backlink profile</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h4>Opportunity Score Factors:</h4>
+                    <ul>
+                        <li>Revenue potential</li>
+                        <li>SEO improvement potential</li>
+                        <li>Competition level</li>
+                        <li>Market position</li>
+                        <li>Quick win opportunities</li>
+                    </ul>
+                </div>
+
+                <h3>Lead Details</h3>
+                <p>Click on any lead to see full SEO audit summary, specific issues found, improvement recommendations, estimated impact, and talking points for outreach.</p>
+
+                <h3>Exporting Leads</h3>
+                <ol>
+                    <li>Select leads you want to export (or export all)</li>
+                    <li>Click "Export to CSV"</li>
+                    <li>CSV includes contact information, scores and metrics, key talking points, and next steps</li>
+                </ol>
+            </section>
+
+            <section id="automated">
+                <h2>Automated Discovery</h2>
+                <p>Set up automated weekly lead generation campaigns.</p>
+
+                <h3>Creating a Campaign</h3>
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">Click "Automated Discovery"</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <strong>Set Campaign Parameters</strong><br>
+                        Campaign name, industry/vertical, geographic targeting, number of leads per week, delivery email address
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <strong>Configure Schedule</strong><br>
+                        Choose day of week for delivery, set time (optional), select report format
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <strong>Launch Campaign</strong><br>
+                        Click "Create Campaign" - system automatically runs weekly and sends email reports
+                    </div>
+                </div>
+
+                <h3>Campaign Dashboard</h3>
+                <div class="card">
+                    <p>View all active campaigns with:</p>
+                    <ul>
+                        <li>Campaign name and status</li>
+                        <li>Next scheduled run</li>
+                        <li>Last run results</li>
+                        <li>Total leads generated</li>
+                        <li>Campaign performance</li>
+                    </ul>
+                </div>
+
+                <h3>Managing Campaigns</h3>
+                <table class="score-table">
+                    <thead>
+                        <tr>
+                            <th>Action</th>
+                            <th>Steps</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Edit Campaign</td>
+                            <td>Click on campaign name, modify parameters, save changes</td>
+                        </tr>
+                        <tr>
+                            <td>Pause Campaign</td>
+                            <td>Click "Pause" button, campaign stops running, click "Resume" to restart</td>
+                        </tr>
+                        <tr>
+                            <td>Delete Campaign</td>
+                            <td>Click "Delete" button, confirm deletion, campaign permanently removed</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Email Reports</h3>
+                <div class="card">
+                    <p>Weekly emails include:</p>
+                    <ul>
+                        <li>Executive summary</li>
+                        <li>New leads discovered</li>
+                        <li>Industry insights</li>
+                        <li>Top opportunities</li>
+                        <li>CSV attachment with full data</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="clients">
+                <h2>Client Management</h2>
+                <p>Create and manage client portal access.</p>
+
+                <h3>Creating Client Accounts</h3>
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">Click "Client Management"</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">Click "Add New Client"</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <strong>Enter Client Information</strong><br>
+                        Client company name, primary contact name, email address, password (temporary)
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <div class="step-content">Click "Create Client User" - credentials will be displayed to share securely with client</div>
+                </div>
+
+                <h3>Managing Existing Clients</h3>
+                <div class="card">
+                    <h4>View All Clients:</h4>
+                    <p>List shows all client accounts with company name, contact email, number of assigned reports, and account status.</p>
+                </div>
+
+                <div class="card">
+                    <h4>Quick Actions:</h4>
+                    <ul>
+                        <li><strong>Edit Client:</strong> Click on client name, update information, save changes</li>
+                        <li><strong>Reset Password:</strong> Click "Reset Password" next to client, new temporary password generated, share securely</li>
+                        <li><strong>Deactivate Client:</strong> Click "Deactivate" button, client loses portal access, data retained for reactivation</li>
+                    </ul>
+                </div>
+
+                <h3>Assigning Reports to Clients</h3>
+                <div class="alert alert-success">
+                    <strong>From Any Tool:</strong> Complete an audit or scan, click "Assign to Client", select client from dropdown, click "Assign"
+                </div>
+                <div class="alert alert-success">
+                    <strong>From Client Management:</strong> View client details, click "Assign Reports", select from available reports, click "Assign Selected"
+                </div>
+
+                <h3>Client Portal Features</h3>
+                <div class="card">
+                    <p>Clients can:</p>
+                    <ul>
+                        <li>Log in with their credentials</li>
+                        <li>View assigned audits and reports</li>
+                        <li>Download reports as CSV</li>
+                        <li>See historical reports</li>
+                        <li><strong>Cannot</strong> create new audits</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="tips">
+                <h2>Tips & Best Practices</h2>
+
+                <div class="card">
+                    <h4>SEO Audits</h4>
+                    <ul>
+                        <li>Run audits on full domains, not individual pages</li>
+                        <li>Schedule regular re-audits to track progress</li>
+                        <li>Use audit results as sales tools for clients</li>
+                        <li>Focus on high-priority recommendations first</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h4>Security Scans</h4>
+                    <ul>
+                        <li>Run scans during off-peak hours when possible</li>
+                        <li>Address Critical and High severity issues immediately</li>
+                        <li>Keep records of all scans for compliance</li>
+                        <li>Re-scan after implementing fixes</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h4>Content Generation</h4>
+                    <ul>
+                        <li>Always review and fact-check AI content</li>
+                        <li>Add company-specific examples and data</li>
+                        <li>Customize tone for each client's brand</li>
+                        <li>Use keyword research to guide content topics</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h4>Lead Generation</h4>
+                    <ul>
+                        <li>Be specific with search criteria for better matches</li>
+                        <li>Focus on opportunity score, not just SEO score</li>
+                        <li>Use audit findings as conversation starters</li>
+                        <li>Track conversion rates by industry/criteria</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h4>Automated Campaigns</h4>
+                    <ul>
+                        <li>Start with one campaign and optimize before scaling</li>
+                        <li>Review weekly reports for trends</li>
+                        <li>Adjust targeting based on lead quality</li>
+                        <li>Use industry analysis for thought leadership</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h4>Client Management</h4>
+                    <ul>
+                        <li>Set strong temporary passwords</li>
+                        <li>Instruct clients to change passwords on first login</li>
+                        <li>Regularly review client access and clean up inactive accounts</li>
+                        <li>Assign reports promptly for better client experience</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="troubleshooting">
+                <h2>Troubleshooting</h2>
+
+                <h3>Common Issues</h3>
+
+                <div class="card">
+                    <h4>Login Problems</h4>
+                    <ul>
+                        <li>Verify email and password are correct</li>
+                        <li>Check for caps lock</li>
+                        <li>Clear browser cache and cookies</li>
+                        <li>Try incognito/private browsing mode</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h4>Audit Taking Too Long</h4>
+                    <ul>
+                        <li>Some sites take longer to analyze</li>
+                        <li>Wait up to 2 minutes before retrying</li>
+                        <li>Check internet connection</li>
+                        <li>Try a different browser</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h4>Export Not Working</h4>
+                    <ul>
+                        <li>Ensure pop-ups are not blocked</li>
+                        <li>Try a different browser</li>
+                        <li>Check download folder settings</li>
+                        <li>Verify sufficient disk space</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h4>Client Can't Log In</h4>
+                    <ul>
+                        <li>Verify credentials were shared correctly</li>
+                        <li>Reset password if needed</li>
+                        <li>Check that account is active</li>
+                        <li>Ensure email is correct</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h4>Reports Not Showing for Client</h4>
+                    <ul>
+                        <li>Verify report was assigned</li>
+                        <li>Check client account is active</li>
+                        <li>Try refreshing the page</li>
+                        <li>Log out and log back in</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h4>Automated Campaign Not Running</h4>
+                    <ul>
+                        <li>Check campaign status (active/paused)</li>
+                        <li>Verify schedule settings</li>
+                        <li>Check email delivery settings</li>
+                        <li>Review campaign logs</li>
+                    </ul>
+                </div>
+
+                <h3>Performance Optimization</h3>
+                <div class="alert alert-info">
+                    <ul>
+                        <li>Close unused browser tabs</li>
+                        <li>Clear cache periodically</li>
+                        <li>Use modern browsers (Chrome, Firefox, Safari, Edge)</li>
+                        <li>Ensure stable internet connection</li>
+                        <li>Allow sufficient time for AI analysis</li>
+                    </ul>
+                </div>
+
+                <h3>Getting Help</h3>
+                <div class="alert alert-warning">
+                    If issues persist:
+                    <ol>
+                        <li>Note the exact error message</li>
+                        <li>Document steps taken</li>
+                        <li>Take screenshots if helpful</li>
+                        <li>Contact C&L Strategy support</li>
+                    </ol>
+                </div>
+            </section>
+
+            <section>
+                <h2>Security & Privacy</h2>
+
+                <div class="card">
+                    <h4>Data Protection</h4>
+                    <ul>
+                        <li>All data encrypted in transit and at rest</li>
+                        <li>Row Level Security prevents unauthorized access</li>
+                        <li>Regular security audits performed</li>
+                        <li>Compliant with data protection regulations</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h4>Password Security</h4>
+                    <ul>
+                        <li>Use strong, unique passwords</li>
+                        <li>Change passwords regularly</li>
+                        <li>Never share passwords via email</li>
+                        <li>Enable two-factor authentication if available</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h4>Client Data Isolation</h4>
+                    <ul>
+                        <li>Each client sees only their assigned reports</li>
+                        <li>No cross-client data visibility</li>
+                        <li>Admin access is logged and monitored</li>
+                        <li>Data deletion available on request</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section>
+                <h2>Support</h2>
+                <div class="alert alert-info">
+                    <p><strong>For technical support, feature requests, or questions:</strong></p>
+                    <p><strong>Contact C&L Strategy</strong><br>
+                    Email: support@clstrategy.com<br>
+                    Response time: 24-48 hours<br>
+                    Emergency support available for critical issues</p>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>&copy; 2025 C&L Strategy. All rights reserved.</p>
+        </footer>
+    </div>
+</body>
+</html>
