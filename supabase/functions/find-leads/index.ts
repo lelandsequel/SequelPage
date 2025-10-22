@@ -268,7 +268,6 @@ Deno.serve(async (req: Request) => {
                   score: lead.score,
                   notes: lead.notes,
                   source: lead.source,
-                  analysis_status: 'basic',
                 }).select();
 
                 if (insertedLead && insertedLead[0]) {
@@ -358,7 +357,6 @@ Deno.serve(async (req: Request) => {
           score: lead.score,
           notes: lead.notes,
           source: lead.source,
-          analysis_status: 'basic',
         }).select();
 
         if (insertedLead && insertedLead[0]) {
