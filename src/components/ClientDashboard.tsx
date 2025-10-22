@@ -89,8 +89,8 @@ export function ClientDashboard({ onNavigate }: ClientDashboardProps) {
     },
     {
       id: 'content',
-      title: 'Generated Content',
-      description: 'View your AI-generated content library',
+      title: 'Content',
+      description: 'View your content library',
       icon: FileText,
       color: 'from-green-500 to-green-600',
       count: stats.content,

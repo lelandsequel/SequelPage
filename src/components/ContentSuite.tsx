@@ -262,7 +262,7 @@ export function ContentSuite({ onBack }: ContentSuiteProps) {
         {result && (
           <Card className="p-8" glassEffect>
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-2xl font-bold text-gray-900">Generated Content</h2>
+              <h2 className="text-2xl font-bold text-gray-900">Content</h2>
               <Button variant="secondary" onClick={copyToClipboard} size="sm">
                 {copied ? (
                   <>
