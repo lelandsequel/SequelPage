@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ArrowLeft, Download, Calendar, TrendingUp } from 'lucide-react';
+import { ArrowLeft, Download, Calendar, TrendingUp, Shield, Search, Sparkles, AlertCircle, CheckCircle, Clock, Target } from 'lucide-react';
 import { Card } from './Card';
 import { Button } from './Button';
 import { useAuth } from '../lib/auth';
@@ -89,7 +89,64 @@ export function ClientAuditsView({ onBack, clientId: propClientId }: ClientAudit
     return 'text-red-600';
   };
 
+  const getSeoScore = (audit: Audit) => {
+    const issues = audit.seo_issues || [];
+    const critical = issues.filter((i: any) => i.severity === 'CRITICAL').length;
+    const high = issues.filter((i: any) => i.severity === 'HIGH').length;
+    const medium = issues.filter((i: any) => i.severity === 'MEDIUM').length;
+
+    let score = 100;
+    score -= critical * 15;
+    score -= high * 10;
+    score -= medium * 5;
+    return Math.max(0, score);
+  };
+
+  const getAeoScore = (audit: Audit) => {
+    const optimizations = audit.aeo_optimizations || [];
+    const total = optimizations.length;
+    if (total === 0) return 75;
+
+    const hasStructuredData = optimizations.some((o: any) =>
+      o.title?.toLowerCase().includes('structured') || o.title?.toLowerCase().includes('schema')
+    );
+    const hasFaq = optimizations.some((o: any) =>
+      o.title?.toLowerCase().includes('faq') || o.title?.toLowerCase().includes('question')
+    );
+    const hasContent = optimizations.some((o: any) =>
+      o.title?.toLowerCase().includes('content') || o.title?.toLowerCase().includes('comprehensive')
+    );
+
+    let score = 60;
+    if (hasStructuredData) score += 15;
+    if (hasFaq) score += 15;
+    if (hasContent) score += 10;
+
+    return Math.min(100, score);
+  };
+
+  const getScoreBgColor = (score: number) => {
+    if (score >= 80) return 'bg-gradient-to-br from-green-500 to-emerald-600';
+    if (score >= 60) return 'bg-gradient-to-br from-yellow-500 to-orange-500';
+    return 'bg-gradient-to-br from-red-500 to-pink-600';
+  };
+
+  const getScoreLabel = (score: number) => {
+    if (score >= 90) return 'Excellent';
+    if (score >= 80) return 'Good';
+    if (score >= 60) return 'Fair';
+    return 'Needs Work';
+  };
+
   if (selectedAudit) {
+    const seoScore = getSeoScore(selectedAudit);
+    const aeoScore = getAeoScore(selectedAudit);
+    const overallScore = Math.round((seoScore + aeoScore) / 2);
+
+    const criticalIssues = selectedAudit.seo_issues?.filter((i: any) => i.severity === 'CRITICAL').length || 0;
+    const highIssues = selectedAudit.seo_issues?.filter((i: any) => i.severity === 'HIGH').length || 0;
+    const mediumIssues = selectedAudit.seo_issues?.filter((i: any) => i.severity === 'MEDIUM').length || 0;
+
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-gray-50 to-blue-100 py-8 px-4">
         <div className="container mx-auto max-w-6xl">
@@ -101,98 +158,188 @@ export function ClientAuditsView({ onBack, clientId: propClientId }: ClientAudit
             Back to Audits
           </button>
 
-          <Card className="p-8 mb-6" glassEffect>
-            <div className="flex justify-between items-start mb-6">
-              <div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                  {selectedAudit.url}
-                </h2>
-                <p className="text-gray-600">
-                  <Calendar className="w-4 h-4 inline mr-2" />
-                  {new Date(selectedAudit.created_at).toLocaleDateString()}
-                </p>
+          <div className="flex justify-between items-start mb-6">
+            <div>
+              <h2 className="text-3xl font-bold text-gray-900 mb-2">
+                {selectedAudit.url}
+              </h2>
+              <p className="text-gray-600 flex items-center">
+                <Calendar className="w-4 h-4 mr-2" />
+                Analyzed on {new Date(selectedAudit.created_at).toLocaleDateString()}
+              </p>
+            </div>
+            <Button
+              variant="secondary"
+              onClick={() => exportAsMarkdown(selectedAudit)}
+            >
+              <Download className="w-4 h-4 mr-2" />
+              Export Report
+            </Button>
+          </div>
+
+          <Card className="p-8 mb-6 text-center" glassEffect>
+            <div className="inline-block">
+              <div className={`w-40 h-40 rounded-full ${getScoreBgColor(overallScore)} flex items-center justify-center shadow-2xl mx-auto mb-4`}>
+                <div className="text-center">
+                  <div className="text-6xl font-bold text-white">{overallScore}</div>
+                  <div className="text-white text-sm font-medium">Overall</div>
+                </div>
               </div>
-              <div className="text-center">
-                <div className={`text-5xl font-bold ${getScoreColor(selectedAudit.score)}`}>
-                  {selectedAudit.score}
+              <div className="text-2xl font-bold text-gray-900 mb-1">{getScoreLabel(overallScore)}</div>
+              <p className="text-gray-600">Your website health score</p>
+            </div>
+          </Card>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <Card className="p-6" glassEffect>
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center">
+                  <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
+                    <Search className="w-6 h-6 text-blue-600" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-gray-900">SEO Health</h3>
+                    <p className="text-sm text-gray-600">Search Engine Visibility</p>
+                  </div>
                 </div>
-                <div className="text-xl font-semibold text-gray-700 mt-1">
-                  {selectedAudit.grade}
+                <div className={`w-20 h-20 rounded-full ${getScoreBgColor(seoScore)} flex items-center justify-center`}>
+                  <div className="text-3xl font-bold text-white">{seoScore}</div>
                 </div>
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={() => exportAsMarkdown(selectedAudit)}
-                  className="mt-4"
-                >
-                  <Download className="w-4 h-4 mr-1" />
-                  Export
-                </Button>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-3 mb-4">
+                <div
+                  className={`h-3 rounded-full ${getScoreBgColor(seoScore)}`}
+                  style={{ width: `${seoScore}%` }}
+                ></div>
+              </div>
+              <div className="space-y-2">
+                {criticalIssues > 0 && (
+                  <div className="flex items-center text-red-600">
+                    <AlertCircle className="w-4 h-4 mr-2" />
+                    <span className="text-sm font-medium">{criticalIssues} critical issues to address</span>
+                  </div>
+                )}
+                {highIssues > 0 && (
+                  <div className="flex items-center text-orange-600">
+                    <Clock className="w-4 h-4 mr-2" />
+                    <span className="text-sm font-medium">{highIssues} important improvements</span>
+                  </div>
+                )}
+                {criticalIssues === 0 && highIssues === 0 && (
+                  <div className="flex items-center text-green-600">
+                    <CheckCircle className="w-4 h-4 mr-2" />
+                    <span className="text-sm font-medium">No major issues detected</span>
+                  </div>
+                )}
+              </div>
+            </Card>
+
+            <Card className="p-6" glassEffect>
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center">
+                  <div className="w-12 h-12 bg-gradient-to-br from-cyan-100 to-blue-100 rounded-lg flex items-center justify-center mr-3">
+                    <Sparkles className="w-6 h-6 text-cyan-600" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-gray-900">AEO Readiness</h3>
+                    <p className="text-sm text-gray-600">AI Search Optimization</p>
+                  </div>
+                </div>
+                <div className={`w-20 h-20 rounded-full ${getScoreBgColor(aeoScore)} flex items-center justify-center`}>
+                  <div className="text-3xl font-bold text-white">{aeoScore}</div>
+                </div>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-3 mb-4">
+                <div
+                  className={`h-3 rounded-full ${getScoreBgColor(aeoScore)}`}
+                  style={{ width: `${aeoScore}%` }}
+                ></div>
+              </div>
+              <p className="text-sm text-gray-600">
+                {aeoScore >= 80 ? 'Your site is well-optimized for AI-powered search engines like ChatGPT, Perplexity, and Claude.' :
+                 aeoScore >= 60 ? 'Good foundation, but room for improvement in AI search visibility.' :
+                 'Significant opportunities to improve visibility in AI search results.'}
+              </p>
+            </Card>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+            <Card className="p-6 text-center" glassEffect>
+              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                <Target className="w-8 h-8 text-blue-600" />
+              </div>
+              <div className="text-3xl font-bold text-gray-900 mb-1">{selectedAudit.recommendations?.length || 0}</div>
+              <p className="text-gray-600 text-sm">Opportunities</p>
+            </Card>
+
+            <Card className="p-6 text-center" glassEffect>
+              <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                <AlertCircle className="w-8 h-8 text-orange-600" />
+              </div>
+              <div className="text-3xl font-bold text-gray-900 mb-1">{criticalIssues + highIssues}</div>
+              <p className="text-gray-600 text-sm">Priority Items</p>
+            </Card>
+
+            <Card className="p-6 text-center" glassEffect>
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                <TrendingUp className="w-8 h-8 text-green-600" />
+              </div>
+              <div className="text-3xl font-bold text-gray-900 mb-1">
+                {Math.round((100 - overallScore) * 0.3)}%
+              </div>
+              <p className="text-gray-600 text-sm">Potential Growth</p>
+            </Card>
+          </div>
+
+          <Card className="p-6" glassEffect>
+            <h3 className="text-xl font-bold text-gray-900 mb-4">What This Means For Your Business</h3>
+            <div className="space-y-4">
+              {criticalIssues > 0 && (
+                <div className="flex items-start p-4 bg-red-50 rounded-lg border border-red-200">
+                  <AlertCircle className="w-5 h-5 text-red-600 mr-3 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <h4 className="font-semibold text-gray-900 mb-1">Immediate Attention Needed</h4>
+                    <p className="text-gray-700 text-sm">
+                      We've identified {criticalIssues} critical issue{criticalIssues > 1 ? 's' : ''} that could be significantly impacting your online visibility and customer reach. Our team is ready to address these first.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {aeoScore < 70 && (
+                <div className="flex items-start p-4 bg-cyan-50 rounded-lg border border-cyan-200">
+                  <Sparkles className="w-5 h-5 text-cyan-600 mr-3 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <h4 className="font-semibold text-gray-900 mb-1">AEO Opportunity</h4>
+                    <p className="text-gray-700 text-sm">
+                      AI-powered search engines like ChatGPT and Perplexity are changing how customers find businesses. We've identified opportunities to position your business in these emerging channels.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {seoScore >= 80 && aeoScore >= 80 && (
+                <div className="flex items-start p-4 bg-green-50 rounded-lg border border-green-200">
+                  <CheckCircle className="w-5 h-5 text-green-600 mr-3 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <h4 className="font-semibold text-gray-900 mb-1">Strong Foundation</h4>
+                    <p className="text-gray-700 text-sm">
+                      Your website is performing well in both traditional and AI-powered search. We'll focus on maintaining this position and exploring growth opportunities.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              <div className="flex items-start p-4 bg-blue-50 rounded-lg border border-blue-200">
+                <Shield className="w-5 h-5 text-blue-600 mr-3 mt-0.5 flex-shrink-0" />
+                <div>
+                  <h4 className="font-semibold text-gray-900 mb-1">Next Steps</h4>
+                  <p className="text-gray-700 text-sm">
+                    Our team has prepared a detailed action plan to improve your scores. We'll reach out to discuss the strategy and timeline for implementation.
+                  </p>
+                </div>
               </div>
             </div>
-
-            {selectedAudit.seo_issues && selectedAudit.seo_issues.length > 0 && (
-              <div className="mb-6">
-                <h3 className="text-xl font-bold text-gray-900 mb-4">SEO Issues</h3>
-                <div className="space-y-4">
-                  {selectedAudit.seo_issues.map((issue: any, idx: number) => (
-                    <div key={idx} className="p-4 bg-white rounded-lg border border-gray-200">
-                      <div className="flex items-start justify-between mb-2">
-                        <h4 className="font-semibold text-gray-900">{issue.title}</h4>
-                        <span className={`px-2 py-1 text-xs font-medium rounded ${
-                          issue.severity === 'CRITICAL' ? 'bg-red-100 text-red-800' :
-                          issue.severity === 'HIGH' ? 'bg-orange-100 text-orange-800' :
-                          issue.severity === 'MEDIUM' ? 'bg-yellow-100 text-yellow-800' :
-                          'bg-blue-100 text-blue-800'
-                        }`}>
-                          {issue.severity}
-                        </span>
-                      </div>
-                      <p className="text-gray-600 text-sm">{issue.description}</p>
-                      {issue.impact && (
-                        <p className="mt-2 text-sm text-green-600 font-medium">
-                          Expected Impact: {issue.impact}
-                        </p>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {selectedAudit.aeo_optimizations && selectedAudit.aeo_optimizations.length > 0 && (
-              <div className="mb-6">
-                <h3 className="text-xl font-bold text-gray-900 mb-4">AEO Optimizations</h3>
-                <div className="space-y-4">
-                  {selectedAudit.aeo_optimizations.map((opt: any, idx: number) => (
-                    <div key={idx} className="p-4 bg-white rounded-lg border border-gray-200">
-                      <h4 className="font-semibold text-gray-900 mb-2">{opt.title}</h4>
-                      <p className="text-gray-600 text-sm">{opt.description}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {selectedAudit.recommendations && selectedAudit.recommendations.length > 0 && (
-              <div>
-                <h3 className="text-xl font-bold text-gray-900 mb-4">Recommendations</h3>
-                <div className="space-y-4">
-                  {selectedAudit.recommendations.map((rec: any, idx: number) => (
-                    <div key={idx} className="p-4 bg-white rounded-lg border border-gray-200">
-                      <h4 className="font-semibold text-gray-900 mb-2">{rec.title}</h4>
-                      <p className="text-gray-600 text-sm">{rec.description}</p>
-                      {rec.expectedImprovement && (
-                        <p className="mt-2 text-sm text-green-600 font-medium">
-                          <TrendingUp className="w-4 h-4 inline mr-1" />
-                          {rec.expectedImprovement}
-                        </p>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
           </Card>
         </div>
       </div>
