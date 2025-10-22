@@ -60,7 +60,7 @@ Include: compelling headline, meta description, introduction, H2/H3 structure, c
         "Authorization": `Bearer ${openaiApiKey}`,
       },
       body: JSON.stringify({
-        model: "gpt-4o",
+        model: "gpt-5",
         messages: [
           {
             role: "system",
