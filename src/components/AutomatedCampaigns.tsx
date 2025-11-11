@@ -120,6 +120,10 @@ export function AutomatedCampaigns({ onBack }: AutomatedCampaignsProps) {
   const runManualDiscovery = async (geography: string) => {
     setIsRunning(true);
 
+    const pollInterval = setInterval(() => {
+      loadRecentRuns();
+    }, 3000);
+
     try {
       const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
       const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
@@ -145,12 +149,18 @@ export function AutomatedCampaigns({ onBack }: AutomatedCampaignsProps) {
     } catch (error) {
       console.error('Manual run error:', error);
     } finally {
+      clearInterval(pollInterval);
       setIsRunning(false);
+      await loadRecentRuns();
     }
   };
 
   const runCampaignNow = async (campaignId: string, geography: string) => {
     setIsRunning(true);
+
+    const pollInterval = setInterval(() => {
+      loadRecentRuns();
+    }, 3000);
 
     try {
       const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
@@ -179,7 +189,9 @@ export function AutomatedCampaigns({ onBack }: AutomatedCampaignsProps) {
     } catch (error) {
       console.error('Campaign run error:', error);
     } finally {
+      clearInterval(pollInterval);
       setIsRunning(false);
+      await loadRecentRuns();
     }
   };
 
