@@ -41,6 +41,10 @@ interface Lead {
 }
 
 export function LeadGenerator({ onBack }: LeadGeneratorProps) {
+  const [geography, setGeography] = useState('');
+  const [industry, setIndustry] = useState('');
+  const [maxResults, setMaxResults] = useState('10');
+  const [isSearching, setIsSearching] = useState(false);
   const [leads, setLeads] = useState<Lead[]>([]);
   const [filteredLeads, setFilteredLeads] = useState<Lead[]>([]);
   const [error, setError] = useState('');
@@ -110,6 +114,52 @@ export function LeadGenerator({ onBack }: LeadGeneratorProps) {
     setFilteredLeads(filtered);
   };
 
+  const handleSearch = async () => {
+    if (!geography || !industry) {
+      setError('Please provide both geography and industry');
+      return;
+    }
+
+    setIsSearching(true);
+    setError('');
+    setLeads([]);
+    setViewMode('search');
+
+    try {
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+      const response = await fetch(
+        `${supabaseUrl}/functions/v1/find-leads`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${supabaseKey}`,
+          },
+          body: JSON.stringify({
+            geography,
+            industry,
+            maxResults: parseInt(maxResults),
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('Lead search failed');
+      }
+
+      const data = await response.json();
+      const leadsData = data.leads || [];
+
+      setLeads(leadsData);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Lead search failed');
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
   const updateLeadStatus = async (leadId: string, status: string) => {
     const { error: updateError } = await supabase
       .from('leads')
@@ -161,8 +211,8 @@ export function LeadGenerator({ onBack }: LeadGeneratorProps) {
           email: values[headers.indexOf('email')],
           phone: values[headers.indexOf('phone')],
           city: values[headers.indexOf('city')],
-          geography: 'Imported',
-          industry: 'Imported',
+          geography: geography || 'Imported',
+          industry: industry || 'Imported',
           score: parseInt(values[headers.indexOf('score')] || '50'),
           traffic_trend: values[headers.indexOf('traffictrend')] || 'Unknown',
           has_schema: values[headers.indexOf('hasschema')]?.toLowerCase() === 'yes',
@@ -222,8 +272,8 @@ export function LeadGenerator({ onBack }: LeadGeneratorProps) {
 
     const rows = filteredLeads.map(lead => [
       new Date().toISOString().split('T')[0],
-      'All',
-      'All',
+      lead.geography || geography || 'All',
+      lead.industry || industry || 'All',
       lead.business_name,
       lead.website || '',
       lead.email || '',
@@ -255,7 +305,9 @@ export function LeadGenerator({ onBack }: LeadGeneratorProps) {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `leads-${new Date().toISOString().split('T')[0]}.csv`;
+    const geoSlug = (geography || 'all').replace(/[^a-z0-9]/gi, '_');
+    const indSlug = (industry || 'all').replace(/[^a-z0-9]/gi, '_');
+    a.download = `leads-${geoSlug}-${indSlug}-${new Date().toISOString().split('T')[0]}.csv`;
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -335,6 +387,50 @@ export function LeadGenerator({ onBack }: LeadGeneratorProps) {
               {error}
             </div>
           )}
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Geography</label>
+              <input
+                type="text"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="e.g., Houston, TX"
+                value={geography}
+                onChange={(e) => setGeography(e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Industry</label>
+              <input
+                type="text"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="e.g., HVAC Services"
+                value={industry}
+                onChange={(e) => setIndustry(e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Max Results</label>
+              <input
+                type="number"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="10"
+                value={maxResults}
+                onChange={(e) => setMaxResults(e.target.value)}
+                min="1"
+                max="50"
+              />
+            </div>
+          </div>
+
+          <Button
+            onClick={handleSearch}
+            isLoading={isSearching}
+            className="w-full md:w-auto"
+          >
+            <Search className="w-4 h-4 mr-2" />
+            {isSearching ? 'Searching...' : 'Find Leads'}
+          </Button>
         </Card>
 
         {showBulkImport && (
@@ -381,11 +477,11 @@ export function LeadGenerator({ onBack }: LeadGeneratorProps) {
                   <Download className="w-4 h-4 mr-1" />
                   Export CSV
                 </Button>
-                <Button variant="secondary" onClick={() => downloadBulkReport(displayLeads, 'All', 'All', 'html')} size="sm">
+                <Button variant="secondary" onClick={() => downloadBulkReport(displayLeads, geography || 'All', industry || 'All', 'html')} size="sm">
                   <FileCode className="w-4 h-4 mr-1" />
                   Bulk HTML
                 </Button>
-                <Button variant="secondary" onClick={() => downloadBulkReport(displayLeads, 'All', 'All', 'txt')} size="sm">
+                <Button variant="secondary" onClick={() => downloadBulkReport(displayLeads, geography || 'All', industry || 'All', 'txt')} size="sm">
                   <FileText className="w-4 h-4 mr-1" />
                   Bulk TXT
                 </Button>
