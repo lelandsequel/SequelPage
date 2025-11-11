@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { ArrowLeft, Download, Users, TrendingUp, TrendingDown, CheckCircle, XCircle, AlertCircle, Link2, BarChart3, FileText, FileCode, Filter, Upload, Search, X } from 'lucide-react';
 import { Card } from './Card';
 import { Button } from './Button';
-import { Input } from './Input';
 import { supabase } from '../lib/supabase';
 import { downloadReport, downloadBulkReport } from '../utils/reportGenerator';
 
@@ -42,10 +41,6 @@ interface Lead {
 }
 
 export function LeadGenerator({ onBack }: LeadGeneratorProps) {
-  const [geography, setGeography] = useState('');
-  const [industry, setIndustry] = useState('');
-  const [maxResults, setMaxResults] = useState('3');
-  const [isSearching, setIsSearching] = useState(false);
   const [leads, setLeads] = useState<Lead[]>([]);
   const [filteredLeads, setFilteredLeads] = useState<Lead[]>([]);
   const [error, setError] = useState('');
@@ -115,52 +110,6 @@ export function LeadGenerator({ onBack }: LeadGeneratorProps) {
     setFilteredLeads(filtered);
   };
 
-  const handleSearch = async () => {
-    if (!geography || !industry) {
-      setError('Please provide both geography and industry');
-      return;
-    }
-
-    setIsSearching(true);
-    setError('');
-    setLeads([]);
-    setViewMode('search');
-
-    try {
-      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-      const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-
-      const response = await fetch(
-        `${supabaseUrl}/functions/v1/find-leads`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${supabaseKey}`,
-          },
-          body: JSON.stringify({
-            geography,
-            industry,
-            maxResults: parseInt(maxResults),
-          }),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error('Lead search failed');
-      }
-
-      const data = await response.json();
-      const leadsData = data.leads || [];
-
-      setLeads(leadsData);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Lead search failed');
-    } finally {
-      setIsSearching(false);
-    }
-  };
-
   const updateLeadStatus = async (leadId: string, status: string) => {
     const { error: updateError } = await supabase
       .from('leads')
@@ -212,8 +161,8 @@ export function LeadGenerator({ onBack }: LeadGeneratorProps) {
           email: values[headers.indexOf('email')],
           phone: values[headers.indexOf('phone')],
           city: values[headers.indexOf('city')],
-          geography: geography || 'Imported',
-          industry: industry || 'Imported',
+          geography: 'Imported',
+          industry: 'Imported',
           score: parseInt(values[headers.indexOf('score')] || '50'),
           traffic_trend: values[headers.indexOf('traffictrend')] || 'Unknown',
           has_schema: values[headers.indexOf('hasschema')]?.toLowerCase() === 'yes',
@@ -273,8 +222,8 @@ export function LeadGenerator({ onBack }: LeadGeneratorProps) {
 
     const rows = filteredLeads.map(lead => [
       new Date().toISOString().split('T')[0],
-      geography,
-      industry,
+      'All',
+      'All',
       lead.business_name,
       lead.website || '',
       lead.email || '',
@@ -306,7 +255,7 @@ export function LeadGenerator({ onBack }: LeadGeneratorProps) {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `leads-${geography.replace(/[^a-z0-9]/gi, '_')}-${industry.replace(/[^a-z0-9]/gi, '_')}-${new Date().toISOString().split('T')[0]}.csv`;
+    a.download = `leads-${new Date().toISOString().split('T')[0]}.csv`;
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -432,11 +381,11 @@ export function LeadGenerator({ onBack }: LeadGeneratorProps) {
                   <Download className="w-4 h-4 mr-1" />
                   Export CSV
                 </Button>
-                <Button variant="secondary" onClick={() => downloadBulkReport(displayLeads, geography, industry, 'html')} size="sm">
+                <Button variant="secondary" onClick={() => downloadBulkReport(displayLeads, 'All', 'All', 'html')} size="sm">
                   <FileCode className="w-4 h-4 mr-1" />
                   Bulk HTML
                 </Button>
-                <Button variant="secondary" onClick={() => downloadBulkReport(displayLeads, geography, industry, 'txt')} size="sm">
+                <Button variant="secondary" onClick={() => downloadBulkReport(displayLeads, 'All', 'All', 'txt')} size="sm">
                   <FileText className="w-4 h-4 mr-1" />
                   Bulk TXT
                 </Button>

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ArrowLeft, FileText, Shield, Users, Trash2, Sparkles } from 'lucide-react';
+import { ArrowLeft, FileText, Shield, Users, Sparkles } from 'lucide-react';
 import { Card } from './Card';
 import { Button } from './Button';
 import { supabase } from '../lib/supabase';

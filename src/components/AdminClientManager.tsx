@@ -33,8 +33,6 @@ export function AdminClientManager({ onBack, onViewClientPortal }: AdminClientMa
   const [userPassword, setUserPassword] = useState('');
   const [createUserClientId, setCreateUserClientId] = useState<string | null>(null);
   const [userCreationStatus, setUserCreationStatus] = useState('');
-  const [viewingClientId, setViewingClientId] = useState<string | null>(null);
-  const [viewingClientName, setViewingClientName] = useState<string>('');
   const [formData, setFormData] = useState({
     company_name: '',
     industry: '',

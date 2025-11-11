@@ -145,7 +145,6 @@ export function ClientAuditsView({ onBack, clientId: propClientId }: ClientAudit
 
     const criticalIssues = selectedAudit.seo_issues?.filter((i: any) => i.severity === 'CRITICAL').length || 0;
     const highIssues = selectedAudit.seo_issues?.filter((i: any) => i.severity === 'HIGH').length || 0;
-    const mediumIssues = selectedAudit.seo_issues?.filter((i: any) => i.severity === 'MEDIUM').length || 0;
 
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-gray-50 to-blue-100 py-8 px-4">
