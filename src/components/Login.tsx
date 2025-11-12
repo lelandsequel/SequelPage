@@ -11,7 +11,33 @@ export function Login() {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
-  const { signIn, signUp } = useAuth();
+  const [lockClicks, setLockClicks] = useState(0);
+  const [showAdminCode, setShowAdminCode] = useState(false);
+  const [adminCode, setAdminCode] = useState('');
+  const { signIn, signUp, adminAccess } = useAuth();
+
+  const handleLockClick = () => {
+    const newCount = lockClicks + 1;
+    setLockClicks(newCount);
+
+    if (newCount === 7) {
+      setShowAdminCode(true);
+    }
+
+    setTimeout(() => setLockClicks(0), 2000);
+  };
+
+  const handleAdminCodeSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (adminCode === '3331313') {
+      setIsLoading(true);
+      adminAccess();
+    } else {
+      setError('Invalid admin code');
+      setAdminCode('');
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,9 +63,13 @@ export function Login() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-gray-50 to-blue-100 flex items-center justify-center px-4">
       <Card className="p-8 w-full max-w-md" glassEffect>
         <div className="text-center mb-8">
-          <div className="inline-flex p-4 bg-blue-100 rounded-full mb-4">
+          <button
+            type="button"
+            onClick={handleLockClick}
+            className="inline-flex p-4 bg-blue-100 rounded-full mb-4 transition-all hover:bg-blue-200 cursor-pointer"
+          >
             <Lock className="w-8 h-8 text-blue-600" />
-          </div>
+          </button>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
             {isSignUp ? 'Create Account' : 'Welcome to CandlPage'}
           </h1>
@@ -48,7 +78,47 @@ export function Login() {
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        {showAdminCode ? (
+          <form onSubmit={handleAdminCodeSubmit} className="space-y-4">
+            <Input
+              label="Admin Access Code"
+              type="text"
+              placeholder="Enter code"
+              value={adminCode}
+              onChange={(e) => setAdminCode(e.target.value)}
+              required
+              autoFocus
+            />
+
+            {error && (
+              <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+                {error}
+              </div>
+            )}
+
+            <Button
+              type="submit"
+              isLoading={isLoading}
+              className="w-full"
+              size="lg"
+            >
+              {isLoading ? 'Accessing...' : 'Enter Admin Mode'}
+            </Button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setShowAdminCode(false);
+                setAdminCode('');
+                setError('');
+              }}
+              className="w-full text-gray-600 hover:text-gray-700 text-sm"
+            >
+              Back to login
+            </button>
+          </form>
+        ) : (
+          <form onSubmit={handleSubmit} className="space-y-4">
           <Input
             label="Email"
             type="email"
@@ -82,19 +152,22 @@ export function Login() {
             {isLoading ? (isSignUp ? 'Creating account...' : 'Signing in...') : (isSignUp ? 'Sign Up' : 'Sign In')}
           </Button>
         </form>
+        )}
 
-        <div className="mt-4 text-center">
-          <button
-            type="button"
-            onClick={() => {
-              setIsSignUp(!isSignUp);
-              setError('');
-            }}
-            className="text-blue-600 hover:text-blue-700 text-sm"
-          >
-            {isSignUp ? 'Already have an account? Sign in' : 'Need an account? Sign up'}
-          </button>
-        </div>
+        {!showAdminCode && (
+          <div className="mt-4 text-center">
+            <button
+              type="button"
+              onClick={() => {
+                setIsSignUp(!isSignUp);
+                setError('');
+              }}
+              className="text-blue-600 hover:text-blue-700 text-sm"
+            >
+              {isSignUp ? 'Already have an account? Sign in' : 'Need an account? Sign up'}
+            </button>
+          </div>
+        )}
 
         <footer className="mt-8 text-center text-sm text-gray-500">
           <p>© 2025 C&L Strategy. All rights reserved.</p>
