@@ -126,7 +126,25 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const adminAccess = () => {
     setUserRole('admin');
     setClientId(null);
-    setUser({ id: 'admin-backdoor' } as User);
+    const mockUser = {
+      id: 'admin-backdoor',
+      aud: 'authenticated',
+      role: 'authenticated',
+      email: 'admin@backdoor.local',
+      app_metadata: {},
+      user_metadata: {},
+      created_at: new Date().toISOString()
+    } as User;
+    setUser(mockUser);
+    const mockSession = {
+      access_token: 'admin-backdoor-token',
+      refresh_token: '',
+      expires_in: 3600,
+      expires_at: Date.now() / 1000 + 3600,
+      token_type: 'bearer',
+      user: mockUser
+    } as Session;
+    setSession(mockSession);
   };
 
   const value = {

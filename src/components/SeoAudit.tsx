@@ -79,18 +79,22 @@ export function SeoAudit({ onBack }: SeoAuditProps) {
 
       setResult(data);
 
-      await supabase.from('seo_audits').insert({
-        url: url || 'HTML Source',
-        html_source: htmlSource || null,
-        score: data.score,
-        grade: data.grade,
-        seo_issues: data.seoIssues || [],
-        aeo_optimizations: data.aeoOptimizations || [],
-        technical_seo: data.technicalSeo || {},
+      try {
+        await supabase.from('seo_audits').insert({
+          url: url || 'HTML Source',
+          html_source: htmlSource || null,
+          score: data.score,
+          grade: data.grade,
+          seo_issues: data.seoIssues || [],
+          aeo_optimizations: data.aeoOptimizations || [],
+          technical_seo: data.technicalSeo || {},
         content_gaps: data.contentGaps || [],
         recommendations: data.recommendations || [],
         client_id: selectedClientId || null,
       });
+      } catch (dbError) {
+        console.warn('Failed to save audit to database:', dbError);
+      }
     } catch (err) {
       console.error('Analysis error:', err);
       setError(err instanceof Error ? err.message : 'Analysis failed');
