@@ -158,6 +158,8 @@ ${JSON.stringify(dataForSeoMetrics?.rankings?.slice(0, 10), null, 2)}
 Provide comprehensive analysis in JSON:
 {
   "score": 0-100,
+  "seoScore": 0-100,
+  "aeoScore": 0-100,
   "grade": "A+/A/A-/B+/B/B-/C+/C/C-/D+/D/D-/F",
   "seoIssues": [{
     "title": "Issue name",
@@ -205,6 +207,11 @@ Provide comprehensive analysis in JSON:
     "opportunities": ["Where you can beat them"]
   }
 }
+
+IMPORTANT: Provide separate scores for:
+- seoScore: Traditional SEO score (meta tags, backlinks, keywords, technical SEO)
+- aeoScore: Answer Engine Optimization score (structured data, schema, AI-friendly content, natural language)
+- score: Overall combined score
 
 Return ONLY JSON, no markdown.`;
 

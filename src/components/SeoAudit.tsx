@@ -84,14 +84,16 @@ export function SeoAudit({ onBack }: SeoAuditProps) {
           url: url || 'HTML Source',
           html_source: htmlSource || null,
           score: data.score,
+          seo_score: data.seoScore,
+          aeo_score: data.aeoScore,
           grade: data.grade,
           seo_issues: data.seoIssues || [],
           aeo_optimizations: data.aeoOptimizations || [],
           technical_seo: data.technicalSeo || {},
-        content_gaps: data.contentGaps || [],
-        recommendations: data.recommendations || [],
-        client_id: selectedClientId || null,
-      });
+          content_gaps: data.contentGaps || [],
+          recommendations: data.recommendations || [],
+          client_id: selectedClientId || null,
+        });
       } catch (dbError) {
         console.warn('Failed to save audit to database:', dbError);
       }
@@ -230,9 +232,26 @@ export function SeoAudit({ onBack }: SeoAuditProps) {
               <div className="flex justify-between items-start mb-6">
                 <div>
                   <h2 className="text-2xl font-bold text-gray-900">Analysis Results</h2>
-                  <div className="mt-2 flex items-center space-x-4">
-                    <div className="text-4xl font-bold text-blue-600">{result.score}/100</div>
-                    <div className="text-2xl font-semibold text-gray-700">{result.grade}</div>
+                  <div className="mt-2 flex items-center space-x-6">
+                    <div>
+                      <div className="text-xs text-gray-500 uppercase tracking-wide mb-1">Overall</div>
+                      <div className="flex items-center space-x-2">
+                        <div className="text-4xl font-bold text-blue-600">{result.score}/100</div>
+                        <div className="text-2xl font-semibold text-gray-700">{result.grade}</div>
+                      </div>
+                    </div>
+                    {result.seoScore !== undefined && (
+                      <div>
+                        <div className="text-xs text-gray-500 uppercase tracking-wide mb-1">SEO Score</div>
+                        <div className="text-3xl font-bold text-green-600">{result.seoScore}/100</div>
+                      </div>
+                    )}
+                    {result.aeoScore !== undefined && (
+                      <div>
+                        <div className="text-xs text-gray-500 uppercase tracking-wide mb-1">AEO Score</div>
+                        <div className="text-3xl font-bold text-purple-600">{result.aeoScore}/100</div>
+                      </div>
+                    )}
                   </div>
                 </div>
                 <div className="flex space-x-2">
