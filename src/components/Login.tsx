@@ -32,7 +32,7 @@ export function Login() {
 
     if (adminCode === '3331313') {
       setIsLoading(true);
-      adminAccess();
+      await adminAccess();
     } else {
       setError('Invalid admin code');
       setAdminCode('');

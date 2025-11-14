@@ -11,7 +11,7 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signUp: (email: string, password: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
-  adminAccess: () => void;
+  adminAccess: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -23,7 +23,7 @@ const AuthContext = createContext<AuthContextType>({
   signIn: async () => ({ error: null }),
   signUp: async () => ({ error: null }),
   signOut: async () => {},
-  adminAccess: () => {},
+  adminAccess: async () => {},
 });
 
 export const useAuth = () => {
@@ -123,28 +123,19 @@ export function AuthProvider({ children }: AuthProviderProps) {
     setClientId(null);
   };
 
-  const adminAccess = () => {
-    setUserRole('admin');
-    setClientId(null);
-    const mockUser = {
-      id: '923f93c9-b43f-41a8-a3ba-d35f580f681b',
-      aud: 'authenticated',
-      role: 'authenticated',
-      email: 'admin@test.com',
-      app_metadata: {},
-      user_metadata: {},
-      created_at: new Date().toISOString()
-    } as User;
-    setUser(mockUser);
-    const mockSession = {
-      access_token: 'admin-backdoor-token',
-      refresh_token: '',
-      expires_in: 3600,
-      expires_at: Date.now() / 1000 + 3600,
-      token_type: 'bearer',
-      user: mockUser
-    } as Session;
-    setSession(mockSession);
+  const adminAccess = async () => {
+    const adminEmail = 'admin@test.com';
+    const adminPassword = 'admin123456';
+
+    const { error } = await supabase.auth.signInWithPassword({
+      email: adminEmail,
+      password: adminPassword,
+    });
+
+    if (error) {
+      console.error('Admin access failed:', error);
+      return;
+    }
   };
 
   const value = {
