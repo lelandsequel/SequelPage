@@ -127,10 +127,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
     setUserRole('admin');
     setClientId(null);
     const mockUser = {
-      id: 'admin-backdoor',
+      id: '923f93c9-b43f-41a8-a3ba-d35f580f681b',
       aud: 'authenticated',
       role: 'authenticated',
-      email: 'admin@backdoor.local',
+      email: 'admin@test.com',
       app_metadata: {},
       user_metadata: {},
       created_at: new Date().toISOString()
