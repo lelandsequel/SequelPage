@@ -137,7 +137,7 @@ async function getGooglePageSpeed(url: string, googleApiKey: string) {
 async function getClaudeAnalysis(url: string, htmlSource: string, anthropicKey: string, dataForSeoMetrics: any, googleMetrics: any) {
   const systemPrompt = `You are an expert SEO and AEO analyst. Analyze the provided data and HTML to give actionable recommendations. Return ONLY valid JSON.`;
 
-  const userPrompt = `Analyze this website comprehensively:
+  const userPrompt = `Analyze this website comprehensively and provide detailed, actionable recommendations:
 
 URL: ${url}
 HTML Source: ${htmlSource.substring(0, 8000)}
@@ -155,6 +155,12 @@ ${JSON.stringify(dataForSeoMetrics?.backlinks, null, 2)}
 Current Keyword Rankings:
 ${JSON.stringify(dataForSeoMetrics?.rankings?.slice(0, 10), null, 2)}
 
+CRITICAL: Provide DETAILED, COMPLETE analysis in JSON. Each issue/optimization must include:
+1. A thorough description (3-5 sentences minimum) explaining the problem/opportunity
+2. Detailed implementation steps (multiple steps, very specific)
+3. Complete, ready-to-use code snippets
+4. Clear impact explanation with specific metrics or benefits
+
 Provide comprehensive analysis in JSON:
 {
   "score": 0-100,
@@ -165,55 +171,62 @@ Provide comprehensive analysis in JSON:
     "title": "Issue name",
     "severity": "LOW/MEDIUM/HIGH/CRITICAL",
     "priority": 1-10,
-    "description": "Detailed explanation",
-    "codeSnippet": "Fix code",
-    "implementation": "How to implement",
-    "impact": "Expected improvement"
+    "description": "DETAILED explanation (3-5 sentences): What is wrong, why it matters, what the consequences are, and why fixing it is important. Include technical context and real-world implications.",
+    "codeSnippet": "Complete, ready-to-implement code with proper formatting and all necessary attributes",
+    "implementation": "DETAILED step-by-step guide (5+ steps): 1. First specific action... 2. Second specific action... Include file locations, exact changes, and testing steps.",
+    "impact": "Specific expected improvements with metrics: e.g., 'Expected to improve organic traffic by 15-20%, increase crawl efficiency, and improve rankings for target keywords within 2-3 months.'"
   }],
   "aeoOptimizations": [{
     "title": "Optimization name",
-    "description": "Details",
-    "codeSnippet": "Implementation code",
-    "implementation": "Steps",
-    "expectedImprovement": "Impact"
+    "description": "COMPREHENSIVE explanation (3-5 sentences): What this optimization does, why it's important for AI search engines, how it helps answer engines understand your content, and the specific benefits for voice search and featured snippets.",
+    "codeSnippet": "Complete, production-ready code with all required schema markup, structured data, or semantic HTML. Include all necessary attributes and proper JSON-LD formatting.",
+    "implementation": "DETAILED implementation guide (5+ steps): 1. Exact file to modify... 2. Where to place the code... 3. How to test... 4. How to validate... 5. How to monitor results. Be extremely specific.",
+    "expectedImprovement": "Specific measurable improvements: e.g., 'Expected to increase featured snippet appearances by 30%, improve voice search discoverability, and boost AI chatbot citation probability by 40% within 1-2 months.'"
   }],
   "technicalSeo": {
-    "present": ["Features found"],
-    "missing": ["Missing features"],
-    "howToAdd": ["Implementation guides"]
+    "present": ["Specific features that are properly implemented with brief explanation of quality"],
+    "missing": ["Specific missing features with explanation of why they're needed"],
+    "howToAdd": ["DETAILED implementation guides (paragraph format): Explain exactly what to do, where to add it, what tools to use, and how to verify it's working correctly. Each guide should be 3-5 sentences."]
   },
   "contentGaps": [{
-    "gap": "Missing content type",
-    "whyItMatters": "Importance",
-    "suggestions": ["Ideas"],
-    "recommendedFormat": "Format type"
+    "gap": "Missing content type with specific details",
+    "whyItMatters": "DETAILED explanation (3+ sentences): Why this content gap is hurting performance, what opportunities are being missed, and how filling it will improve results.",
+    "suggestions": ["Specific, actionable content suggestions with examples and target keywords"],
+    "recommendedFormat": "Detailed format recommendation: type, structure, word count, media to include, and best practices"
   }],
   "recommendations": [{
-    "title": "Recommendation",
-    "description": "Details",
-    "codeSnippet": "Code",
-    "expectedImprovement": "Impact"
+    "title": "Recommendation title",
+    "description": "THOROUGH explanation (3-5 sentences): What to do, why it matters, technical details, and business impact.",
+    "codeSnippet": "Complete, production-ready code with all necessary elements and proper formatting",
+    "expectedImprovement": "Specific, measurable expected improvements with timeframes and metrics"
   }],
   "keywordOpportunities": [{
-    "keyword": "Keyword",
+    "keyword": "Specific keyword phrase",
     "currentPosition": 0,
     "difficulty": "Easy/Medium/Hard",
     "searchVolume": 0,
-    "recommendation": "Strategy"
+    "recommendation": "DETAILED strategy (2-3 sentences): Specific actions to rank for this keyword, content to create, on-page optimizations needed, and link building approach."
   }],
   "competitorInsights": {
-    "summary": "Overview",
-    "gaps": ["What competitors have that you don't"],
-    "opportunities": ["Where you can beat them"]
+    "summary": "COMPREHENSIVE overview (4-6 sentences): Analysis of competitor landscape, who the main competitors are, what they're doing well, where they're weak, and the overall competitive difficulty.",
+    "gaps": ["SPECIFIC things competitors have that you don't - be detailed about features, content types, technical implementations, backlink sources, etc."],
+    "opportunities": ["SPECIFIC opportunities to outperform competitors with actionable strategies and tactics"]
   }
 }
 
-IMPORTANT: Provide separate scores for:
-- seoScore: Traditional SEO score (meta tags, backlinks, keywords, technical SEO)
-- aeoScore: Answer Engine Optimization score (structured data, schema, AI-friendly content, natural language)
-- score: Overall combined score
+CRITICAL REQUIREMENTS:
+1. Provide separate scores for:
+   - seoScore: Traditional SEO score (meta tags, backlinks, keywords, technical SEO)
+   - aeoScore: Answer Engine Optimization score (structured data, schema, AI-friendly content, natural language)
+   - score: Overall combined score
 
-Return ONLY JSON, no markdown.`;
+2. ALL descriptions must be 3-5 sentences minimum with detailed explanations
+3. ALL implementation guides must have 5+ specific steps
+4. ALL code snippets must be complete and production-ready
+5. ALL impact statements must include specific metrics and timeframes
+6. Write as if explaining to someone who will implement these changes themselves
+
+Return ONLY JSON, no markdown or code fences.`;
 
   try {
     const response = await fetch("https://api.anthropic.com/v1/messages", {

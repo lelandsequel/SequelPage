@@ -128,20 +128,220 @@ export function SeoAudit({ onBack }: SeoAuditProps) {
 
   const exportAsMarkdown = () => {
     let markdown = `# SEO/AEO Audit Report\\n\\n`;
-    markdown += `**Score:** ${result.score}/100 (${result.grade})\\n\\n`;
-    markdown += `## SEO Issues\\n\\n`;
-    result.seoIssues?.forEach((issue: any, idx: number) => {
-      markdown += `### ${idx + 1}. ${issue.title}\\n`;
-      markdown += `- **Severity:** ${issue.severity}\\n`;
-      markdown += `- **Priority:** ${issue.priority}/10\\n`;
-      markdown += `- **Description:** ${issue.description}\\n\\n`;
-    });
+    markdown += `**Website:** ${url || 'HTML Source'}\\n`;
+    markdown += `**Date:** ${new Date().toLocaleDateString()}\\n\\n`;
+    markdown += `---\\n\\n`;
+
+    markdown += `## Executive Summary\\n\\n`;
+    markdown += `| Metric | Score |\\n`;
+    markdown += `|--------|-------|\\n`;
+    markdown += `| Overall Score | **${result.score}/100** (${result.grade}) |\\n`;
+    if (result.seoScore !== undefined) {
+      markdown += `| SEO Score | **${result.seoScore}/100** |\\n`;
+    }
+    if (result.aeoScore !== undefined) {
+      markdown += `| AEO Score | **${result.aeoScore}/100** |\\n`;
+    }
+    markdown += `\\n`;
+
+    if (result.realMetrics?.dataForSeo?.performance) {
+      markdown += `### Performance Metrics\\n\\n`;
+      markdown += `| Metric | Value |\\n`;
+      markdown += `|--------|-------|\\n`;
+      markdown += `| Performance Score | ${Math.round(result.realMetrics.dataForSeo.performance.score)} |\\n`;
+      markdown += `| Largest Contentful Paint (LCP) | ${(result.realMetrics.dataForSeo.performance.lcp / 1000).toFixed(2)}s |\\n`;
+      markdown += `| Cumulative Layout Shift (CLS) | ${result.realMetrics.dataForSeo.performance.cls.toFixed(3)} |\\n`;
+      markdown += `| First Contentful Paint (FCP) | ${(result.realMetrics.dataForSeo.performance.fcp / 1000).toFixed(2)}s |\\n`;
+      markdown += `\\n`;
+    }
+
+    if (result.realMetrics?.dataForSeo?.backlinks) {
+      markdown += `### Backlink Profile\\n\\n`;
+      markdown += `| Metric | Count |\\n`;
+      markdown += `|--------|-------|\\n`;
+      markdown += `| Total Backlinks | ${result.realMetrics.dataForSeo.backlinks.total.toLocaleString()} |\\n`;
+      markdown += `| Referring Domains | ${result.realMetrics.dataForSeo.backlinks.referringDomains.toLocaleString()} |\\n`;
+      markdown += `| Follow Links | ${result.realMetrics.dataForSeo.backlinks.followLinks.toLocaleString()} |\\n`;
+      markdown += `\\n`;
+    }
+
+    markdown += `---\\n\\n`;
+
+    if (result.seoIssues && result.seoIssues.length > 0) {
+      markdown += `## SEO Issues & Fixes\\n\\n`;
+      markdown += `This section identifies traditional search engine optimization problems and provides detailed solutions.\\n\\n`;
+
+      result.seoIssues.forEach((issue: any, idx: number) => {
+        markdown += `### ${idx + 1}. ${issue.title}\\n\\n`;
+        markdown += `**Severity:** ${issue.severity} | **Priority:** ${issue.priority}/10\\n\\n`;
+        markdown += `#### Problem Description\\n\\n`;
+        markdown += `${issue.description}\\n\\n`;
+
+        if (issue.impact) {
+          markdown += `#### Expected Impact\\n\\n`;
+          markdown += `${issue.impact}\\n\\n`;
+        }
+
+        if (issue.implementation) {
+          markdown += `#### Implementation Guide\\n\\n`;
+          markdown += `${issue.implementation}\\n\\n`;
+        }
+
+        if (issue.codeSnippet) {
+          markdown += `#### Code Solution\\n\\n`;
+          markdown += `\\\`\\\`\\\`html\\n${issue.codeSnippet}\\n\\\`\\\`\\\`\\n\\n`;
+        }
+
+        markdown += `---\\n\\n`;
+      });
+    }
+
+    if (result.aeoOptimizations && result.aeoOptimizations.length > 0) {
+      markdown += `## Answer Engine Optimization (AEO)\\n\\n`;
+      markdown += `These optimizations help your content appear in AI-powered search results and answer engines.\\n\\n`;
+
+      result.aeoOptimizations.forEach((opt: any, idx: number) => {
+        markdown += `### ${idx + 1}. ${opt.title}\\n\\n`;
+        markdown += `#### Description\\n\\n`;
+        markdown += `${opt.description}\\n\\n`;
+
+        if (opt.expectedImprovement) {
+          markdown += `#### Expected Improvement\\n\\n`;
+          markdown += `${opt.expectedImprovement}\\n\\n`;
+        }
+
+        if (opt.implementation) {
+          markdown += `#### Implementation Steps\\n\\n`;
+          markdown += `${opt.implementation}\\n\\n`;
+        }
+
+        if (opt.codeSnippet) {
+          markdown += `#### Code Example\\n\\n`;
+          markdown += `\\\`\\\`\\\`html\\n${opt.codeSnippet}\\n\\\`\\\`\\\`\\n\\n`;
+        }
+
+        markdown += `---\\n\\n`;
+      });
+    }
+
+    if (result.technicalSeo) {
+      markdown += `## Technical SEO Audit\\n\\n`;
+
+      if (result.technicalSeo.present && result.technicalSeo.present.length > 0) {
+        markdown += `### ✅ Implemented Features\\n\\n`;
+        result.technicalSeo.present.forEach((feature: string) => {
+          markdown += `- ${feature}\\n`;
+        });
+        markdown += `\\n`;
+      }
+
+      if (result.technicalSeo.missing && result.technicalSeo.missing.length > 0) {
+        markdown += `### ❌ Missing Features\\n\\n`;
+        result.technicalSeo.missing.forEach((feature: string) => {
+          markdown += `- ${feature}\\n`;
+        });
+        markdown += `\\n`;
+      }
+
+      if (result.technicalSeo.howToAdd && result.technicalSeo.howToAdd.length > 0) {
+        markdown += `### 📋 Implementation Guides\\n\\n`;
+        result.technicalSeo.howToAdd.forEach((guide: string, idx: number) => {
+          markdown += `${idx + 1}. ${guide}\\n\\n`;
+        });
+      }
+
+      markdown += `---\\n\\n`;
+    }
+
+    if (result.contentGaps && result.contentGaps.length > 0) {
+      markdown += `## Content Gaps Analysis\\n\\n`;
+      markdown += `These content opportunities can improve your site's authority and rankings.\\n\\n`;
+
+      result.contentGaps.forEach((gap: any, idx: number) => {
+        markdown += `### ${idx + 1}. ${gap.gap}\\n\\n`;
+        markdown += `**Why It Matters:** ${gap.whyItMatters}\\n\\n`;
+
+        if (gap.recommendedFormat) {
+          markdown += `**Recommended Format:** ${gap.recommendedFormat}\\n\\n`;
+        }
+
+        if (gap.suggestions && gap.suggestions.length > 0) {
+          markdown += `**Suggestions:**\\n\\n`;
+          gap.suggestions.forEach((suggestion: string) => {
+            markdown += `- ${suggestion}\\n`;
+          });
+          markdown += `\\n`;
+        }
+
+        markdown += `---\\n\\n`;
+      });
+    }
+
+    if (result.keywordOpportunities && result.keywordOpportunities.length > 0) {
+      markdown += `## Keyword Opportunities\\n\\n`;
+      markdown += `| Keyword | Current Position | Difficulty | Search Volume | Recommendation |\\n`;
+      markdown += `|---------|------------------|------------|---------------|----------------|\\n`;
+
+      result.keywordOpportunities.forEach((kw: any) => {
+        markdown += `| ${kw.keyword} | ${kw.currentPosition || 'Not Ranking'} | ${kw.difficulty} | ${kw.searchVolume?.toLocaleString() || 'N/A'} | ${kw.recommendation} |\\n`;
+      });
+
+      markdown += `\\n---\\n\\n`;
+    }
+
+    if (result.recommendations && result.recommendations.length > 0) {
+      markdown += `## Additional Recommendations\\n\\n`;
+
+      result.recommendations.forEach((rec: any, idx: number) => {
+        markdown += `### ${idx + 1}. ${rec.title}\\n\\n`;
+        markdown += `${rec.description}\\n\\n`;
+
+        if (rec.expectedImprovement) {
+          markdown += `**Expected Improvement:** ${rec.expectedImprovement}\\n\\n`;
+        }
+
+        if (rec.codeSnippet) {
+          markdown += `**Implementation:**\\n\\n`;
+          markdown += `\\\`\\\`\\\`html\\n${rec.codeSnippet}\\n\\\`\\\`\\\`\\n\\n`;
+        }
+
+        markdown += `---\\n\\n`;
+      });
+    }
+
+    if (result.competitorInsights) {
+      markdown += `## Competitive Analysis\\n\\n`;
+
+      if (result.competitorInsights.summary) {
+        markdown += `### Summary\\n\\n`;
+        markdown += `${result.competitorInsights.summary}\\n\\n`;
+      }
+
+      if (result.competitorInsights.gaps && result.competitorInsights.gaps.length > 0) {
+        markdown += `### Competitive Gaps\\n\\n`;
+        result.competitorInsights.gaps.forEach((gap: string) => {
+          markdown += `- ${gap}\\n`;
+        });
+        markdown += `\\n`;
+      }
+
+      if (result.competitorInsights.opportunities && result.competitorInsights.opportunities.length > 0) {
+        markdown += `### Opportunities\\n\\n`;
+        result.competitorInsights.opportunities.forEach((opp: string) => {
+          markdown += `- ${opp}\\n`;
+        });
+        markdown += `\\n`;
+      }
+    }
+
+    markdown += `---\\n\\n`;
+    markdown += `*Report generated on ${new Date().toLocaleString()}*\\n`;
 
     const blob = new Blob([markdown], { type: 'text/markdown' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'seo-audit.md';
+    a.download = `seo-audit-${new Date().toISOString().split('T')[0]}.md`;
     a.click();
   };
 
